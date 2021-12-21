@@ -1,48 +1,7 @@
-env:
-  workspace:
-    walls: False
-    pos: [-0.614, 0, 0]
-    quat:
-      w: 0.7071232
-      x: 0.0
-      y: 0.0
-      z: 0.707904
-  camera:
-    pos: [0.0, 0.0, 0.6]
-    target_pos: [.0, 0.0, 0.0]
-    up_vector: [0.0, 1.0, 0.0]
-    intrinsics:
-      fx: 463
-      fy: 463
-      cx: 320
-      cy: 240
-      width: 640
-      height: 480
-  scene_generation:
-    all_equal_height_prob: 0.0
-    target:
-      min_bounding_box: [ .01, .01, .005 ]
-      max_bounding_box: [ .03, .03, .020 ]
-      probability_box: 1.0
-      enforce_convex_hull: 15
-      randomize_pos: True
-    obstacle:
-      min_bounding_box: [ .01, .01, .005 ]
-      max_bounding_box: [ .03, .03, .020 ]
-      probability_box: 1.0
-      pushable_threshold_coeff: -0.5 # Set -0.5 by default or 1 if standalone push obstacle
-    nr_of_obstacles:
-      - 1
-      - 13
-
-mdp:
-  push:
-    distance: [0.02, 0.10]
-    predict_collision: True
-    obstacle_avoid: True
-
-agent:
-  autoencoder:
-    model_weights: '../models/ae/model.pth'
-    normalizer: '../models/ae/feature_normalizer.pkl'
-  device: 'cpu'
+robot:
+  name: "ur5"
+  joints: ['ur5_shoulder_pan_joint', 'ur5_shoulder_lift_joint',
+            'ur5_elbow_joint', 'ur5_wrist_1_joint', 'ur5_wrist_2_joint',
+            'ur5_wrist_3_joint']
+  ee_link: "tool_link"
+  urdf: "../assets/ur5e.urdf"

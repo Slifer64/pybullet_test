@@ -1,0 +1,1955 @@
+<?xml version="1.0"?>
+<robot  name="UNNAMED_0" >
+ <link  name="target" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01"  filename="./vine/grape_bunch.stl" />
+   </geometry>
+   <material  name="target_material" >
+    <color  rgba="0.3 0 0.7 0.5" />
+   </material>
+  </visual>
+ </link>
+ <link  name="branch_0" >
+  <visual >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0.0 0 0" />
+   <material  name="branch_0_material" >
+    <color  rgba="0.4 0.25 0 0.6" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+ </link>
+ <link  name="branch_0_link_x" />
+ <joint  name="branch_0_joint_x"  type="revolute" >
+  <parent  link="target" />
+  <child  link="branch_0_link_x" />
+  <limit  lower="-6.283185307179586"  velocity="100"  upper="6.283185307179586"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.2 0.2 0.35"  rpy="1.5707963267948963 0.8768157318939024 -0.5880026035475676" />
+ </joint>
+ <link  name="branch_0_link_y" />
+ <joint  name="branch_0_joint_y"  type="revolute" >
+  <parent  link="branch_0_link_x" />
+  <child  link="branch_0_link_y" />
+  <limit  lower="-6.283185307179586"  velocity="100"  upper="6.283185307179586"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="branch_0_joint"  type="fixed" >
+  <parent  link="branch_0_link_y" />
+  <child  link="branch_0" />
+ </joint>
+ <link  name="branch_0_leaf_0" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.013733330630307981"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.006583960767523213 0.04956461904031661 0.2700603665485256"  rpy="2.7755575615628914e-17 -0.9237938808963653 0.13206275572734275" />
+   <material  name="branch_0_leaf_0_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.790799516039887e-05"  iyz="0.0"  iyy="8.790799516039887e-05"  izz="8.790799516039887e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_0_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_0" />
+ </joint>
+ <link  name="branch_0_leaf_1" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.010795999950080182"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <origin  xyz="0.04716831153384256 0.01658765767208786 0.3882270306335021"  rpy="1.1102230246251565e-16 -0.4882818589307187 -1.2326349557121339" />
+   <material  name="branch_0_leaf_1_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011102848940146241"  iyz="0.0"  iyy="0.00011102848940146241"  izz="0.00011102848940146241"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_1_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_1" />
+ </joint>
+ <link  name="branch_0_leaf_2" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.014723156081497202"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.010586907557168476 -0.04886632161699885 0.2837809693816618"  rpy="3.141592653589793 -0.9181007722981155 0.21335309372548017" />
+   <material  name="branch_0_leaf_2_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.051249860533153e-05"  iyz="0.0"  iyy="8.051249860533153e-05"  izz="8.051249860533153e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_2_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_2" />
+ </joint>
+ <link  name="branch_0_leaf_3" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.0116577788130088"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <origin  xyz="-0.04719742483467983 0.016504638407876384 0.05005215335606972"  rpy="0.0 -0.4865163039912185 1.2343944766142734" />
+   <material  name="branch_0_leaf_3_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.486858368027332e-05"  iyz="0.0"  iyy="8.486858368027332e-05"  izz="8.486858368027332e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_3_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_3" />
+ </joint>
+ <link  name="branch_0_leaf_4" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01664917866615319"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <origin  xyz="0.020745937275984314 0.04549292347762369 0.0741958672346883"  rpy="-1.1102230246251565e-16 -0.8891815987428 -0.4278534966277839" />
+   <material  name="branch_0_leaf_4_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.30452544408818e-05"  iyz="0.0"  iyy="9.30452544408818e-05"  izz="9.30452544408818e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_4_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_4" />
+ </joint>
+ <link  name="branch_0_leaf_5" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01935789837545561"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.04823650292142856 0.013162058574213004 0.42006392457968955"  rpy="1.1102230246251565e-16 -0.41089081368971225 -1.304415989398763" />
+   <material  name="branch_0_leaf_5_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011849059371683476"  iyz="0.0"  iyy="0.00011849059371683476"  izz="0.00011849059371683476"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_5_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_5" />
+ </joint>
+ <link  name="branch_0_leaf_6" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012396976374679035"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <origin  xyz="0.02352596550031217 0.044119484893617264 0.34289682744732347"  rpy="0.0 -0.8766901292200545 -0.48987921255452477" />
+   <material  name="branch_0_leaf_6_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.819870719010738e-05"  iyz="0.0"  iyy="8.819870719010738e-05"  izz="8.819870719010738e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_6_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_6" />
+ </joint>
+ <link  name="branch_0_leaf_7" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.014632943213731296"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.022883136830799237 -0.044456293691477695 0.26826674639106846"  rpy="3.141592653589793 -0.8797939071670984 0.4753646941549803" />
+   <material  name="branch_0_leaf_7_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011956027911399997"  iyz="0.0"  iyy="0.00011956027911399997"  izz="0.00011956027911399997"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_7_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_7" />
+ </joint>
+ <link  name="branch_0_leaf_8" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.019504625593342817"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.02145314402116516 -0.045163731152409736 0.3476226224976829"  rpy="3.141592653589793 -0.8862271082003151 0.4434550518141336" />
+   <material  name="branch_0_leaf_8_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010143856763033302"  iyz="0.0"  iyy="0.00010143856763033302"  izz="0.00010143856763033302"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_8_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_8" />
+ </joint>
+ <link  name="branch_0_leaf_9" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.018825160562834394"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <origin  xyz="0.01563625447723619 -0.04749218405088475 0.12162185288570077"  rpy="3.141592653589793 -0.9066109372798049 0.3180606700425288" />
+   <material  name="branch_0_leaf_9_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.863450596377719e-05"  iyz="0.0"  iyy="8.863450596377719e-05"  izz="8.863450596377719e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_9_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_9" />
+ </joint>
+ <link  name="branch_0_leaf_10" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.009534906576850754"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.018498399010068032 -0.04645222528646302 0.30981088502973775"  rpy="3.141592653589793 -0.8976531374111711 0.3789745551583088" />
+   <material  name="branch_0_leaf_10_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010291859094123225"  iyz="0.0"  iyy="0.00010291859094123225"  izz="0.00010291859094123225"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_10_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_10" />
+ </joint>
+ <link  name="branch_0_leaf_11" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.019647462259863458"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="0.041466117329029155 -0.027938523827417728 0.10579317216273348"  rpy="3.141592653589793 -0.6883986709347637 0.9778938325433597" />
+   <material  name="branch_0_leaf_11_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011942359486126983"  iyz="0.0"  iyy="0.00011942359486126983"  izz="0.00011942359486126983"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_11_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_11" />
+ </joint>
+ <link  name="branch_0_leaf_12" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01991708033286379"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="-0.012886624250109481 -0.04831081571901359 0.17282332312028703"  rpy="3.141592653589793 -0.9135023741301821 -0.2606746672489175" />
+   <material  name="branch_0_leaf_12_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.790957402722109e-05"  iyz="0.0"  iyy="9.790957402722109e-05"  izz="9.790957402722109e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_12_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_12" />
+ </joint>
+ <link  name="branch_0_leaf_13" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.008066139125876531"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="0.03772134270315896 -0.03281920633822269 0.2570016341407226"  rpy="3.141592653589793 -0.7545826315220482 0.8547804940096535" />
+   <material  name="branch_0_leaf_13_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.598195457824742e-05"  iyz="0.0"  iyy="8.598195457824742e-05"  izz="8.598195457824742e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_13_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_13" />
+ </joint>
+ <link  name="branch_0_leaf_14" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01753145649249076"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <origin  xyz="0.014335657331424643 0.04790082388514806 0.2002102746166003"  rpy="-8.326672684688674e-17 -0.9100682757683889 -0.29079417338295055" />
+   <material  name="branch_0_leaf_14_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.189671370257008e-05"  iyz="0.0"  iyy="8.189671370257008e-05"  izz="8.189671370257008e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_14_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_14" />
+ </joint>
+ <link  name="branch_0_leaf_15" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.0187066425417356"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="0.02855989087709326 -0.041040621743444944 0.4888468097538032"  rpy="-3.1415926535897927 -0.8470290589871987 0.6079644227578549" />
+   <material  name="branch_0_leaf_15_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.878454071653854e-05"  iyz="0.0"  iyy="8.878454071653854e-05"  izz="8.878454071653854e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_15_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_15" />
+ </joint>
+ <link  name="branch_0_leaf_16" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.005721453222838415"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <origin  xyz="0.0492670231160171 -0.008529972642736755 0.2299789210126364"  rpy="3.141592653589793 -0.28943600546021175 1.3993583183686773" />
+   <material  name="branch_0_leaf_16_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.457783283040831e-05"  iyz="0.0"  iyy="9.457783283040831e-05"  izz="9.457783283040831e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_16_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_16" />
+ </joint>
+ <link  name="branch_0_leaf_17" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01953057597611517"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="0.043805359107376 0.02410581907909024 0.22938432442428003"  rpy="0.0 -0.6289868106877876 -1.067727550376464" />
+   <material  name="branch_0_leaf_17_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.883454531404949e-05"  iyz="0.0"  iyy="9.883454531404949e-05"  izz="9.883454531404949e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_17_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_17" />
+ </joint>
+ <link  name="branch_0_leaf_18" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.011137318129392879"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.026716942231122975 0.04226351852151969 0.437529525754015"  rpy="0.0 -0.8590958822827313 -0.5637253714523066" />
+   <material  name="branch_0_leaf_18_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.226983018090484e-05"  iyz="0.0"  iyy="8.226983018090484e-05"  izz="8.226983018090484e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_18_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_18" />
+ </joint>
+ <link  name="branch_0_leaf_19" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.006831169612560052"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <origin  xyz="0.04372922977134046 -0.024243647902188973 0.4546605695943229"  rpy="3.141592653589793 -0.6312513848853072 1.0645784247345824" />
+   <material  name="branch_0_leaf_19_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010444207793233935"  iyz="0.0"  iyy="0.00010444207793233935"  izz="0.00010444207793233935"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_19_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_19" />
+ </joint>
+ <link  name="branch_0_leaf_20" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.0181104377557538"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="0.04991844147664695 -0.002854680462428893 0.030600843256041843"  rpy="-3.1415926535897927 -0.10791511783227661 1.5136716541410684" />
+   <material  name="branch_0_leaf_20_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010847292396251202"  iyz="0.0"  iyy="0.00010847292396251202"  izz="0.00010847292396251202"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_20_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_20" />
+ </joint>
+ <link  name="branch_0_leaf_21" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.008299917290683636"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="-0.02550342043965111 -0.04300669187322348 0.09284316450308067"  rpy="-3.1415926535897927 -0.8662426161886428 -0.535264321131129" />
+   <material  name="branch_0_leaf_21_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.447693541543822e-05"  iyz="0.0"  iyy="9.447693541543822e-05"  izz="9.447693541543822e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_21_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_21" />
+ </joint>
+ <link  name="branch_0_leaf_22" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01696937848048767"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="0.00033300206298059805 0.04999889108396356 0.49716155617711494"  rpy="-4.336808689942018e-19 -0.9272863465552685 -0.006660090496225795" />
+   <material  name="branch_0_leaf_22_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010772922182743714"  iyz="0.0"  iyy="0.00010772922182743714"  izz="0.00010772922182743714"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_22_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_22" />
+ </joint>
+ <link  name="branch_0_leaf_23" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015117214778143932"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.049366117747220606 -0.007936398337252935 0.13407341285726487"  rpy="3.141592653589793 -0.27227471669348735 -1.411394174364947" />
+   <material  name="branch_0_leaf_23_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.004488799243869e-05"  iyz="0.0"  iyy="9.004488799243869e-05"  izz="9.004488799243869e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_23_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_23" />
+ </joint>
+ <link  name="branch_0_leaf_24" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015505343712052328"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <origin  xyz="0.049640798706186075 -0.005982566657540479 0.14931918744155487"  rpy="3.141592653589793 -0.21292155701006668 1.4508576416454328" />
+   <material  name="branch_0_leaf_24_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011780422014932206"  iyz="0.0"  iyy="0.00011780422014932206"  izz="0.00011780422014932206"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_24_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_24" />
+ </joint>
+ <link  name="branch_0_leaf_25" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01894440427107916"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="0.004333619344926264 0.04981184340468922 0.0550622123594236"  rpy="1.3877787807814457e-17 -0.9257865591552844 -0.0867812706886327" />
+   <material  name="branch_0_leaf_25_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.564104325110826e-05"  iyz="0.0"  iyy="8.564104325110826e-05"  izz="8.564104325110826e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_25_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_25" />
+ </joint>
+ <link  name="branch_0_leaf_26" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.008028528493315042"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="0.03287585608506351 -0.037671980126802375 0.29429028255353135"  rpy="3.141592653589793 -0.811676792764619 0.7175186113882601" />
+   <material  name="branch_0_leaf_26_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010830335730881926"  iyz="0.0"  iyy="0.00010830335730881926"  izz="0.00010830335730881926"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_26_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_26" />
+ </joint>
+ <link  name="branch_0_leaf_27" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.014480305774915225"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="-0.029560164498096578 0.04032612893454405 0.07402273387283481"  rpy="5.551115123125783e-17 -0.8397961786444856 0.6325499746595513" />
+   <material  name="branch_0_leaf_27_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.426926391180712e-05"  iyz="0.0"  iyy="9.426926391180712e-05"  izz="9.426926391180712e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_27_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_27" />
+ </joint>
+ <link  name="branch_0_leaf_28" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012103576537140474"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.037638639504996727 0.03291402157459492 0.3050907885897458"  rpy="0.0 -0.7557757132475172 0.8522641668141331" />
+   <material  name="branch_0_leaf_28_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.510303870559632e-05"  iyz="0.0"  iyy="8.510303870559632e-05"  izz="8.510303870559632e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_28_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_28" />
+ </joint>
+ <link  name="branch_0_leaf_29" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.013522872773500626"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="-0.04902778161391308 -0.0098120655327228 0.06043448100850313"  rpy="3.141592653589793 -0.3251999319276079 -1.3732731108350418" />
+   <material  name="branch_0_leaf_29_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010592593405042605"  iyz="0.0"  iyy="0.00010592593405042605"  izz="0.00010592593405042605"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_29_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_29" />
+ </joint>
+ <link  name="branch_0_leaf_30" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.00693335746787814"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <origin  xyz="-0.03703541743699782 0.033591336014920835 0.36439012307201774"  rpy="0.0 -0.7642036204559811 0.834124108679542" />
+   <material  name="branch_0_leaf_30_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.26884280819881e-05"  iyz="0.0"  iyy="9.26884280819881e-05"  izz="9.26884280819881e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_30_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_30" />
+ </joint>
+ <link  name="branch_0_leaf_31" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.009724420164163382"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <origin  xyz="0.04247312397629633 0.026382451358699818 0.11689297687222638"  rpy="1.1102230246251565e-16 -0.6651408139295301 -1.0149657485565426" />
+   <material  name="branch_0_leaf_31_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.269909416401806e-05"  iyz="0.0"  iyy="8.269909416401806e-05"  izz="8.269909416401806e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_31_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_31" />
+ </joint>
+ <link  name="branch_0_leaf_32" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015505861748082706"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.04960847772825039 -0.0062449129285912204 0.16266136748380972"  rpy="3.141592653589793 -0.22115561069462253 -1.445571040685353" />
+   <material  name="branch_0_leaf_32_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.407626476884992e-05"  iyz="0.0"  iyy="9.407626476884992e-05"  izz="9.407626476884992e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_32_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_32" />
+ </joint>
+ <link  name="branch_0_leaf_33" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.019346003373509994"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <origin  xyz="0.03932570029161448 0.030878621999275047 0.13286959817555888"  rpy="-1.1102230246251565e-16 -0.7294198511626081 -0.9051438580086582" />
+   <material  name="branch_0_leaf_33_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011246284835898623"  iyz="0.0"  iyy="0.00011246284835898623"  izz="0.00011246284835898623"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_33_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_33" />
+ </joint>
+ <link  name="branch_0_leaf_34" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01675271426869481"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.03245715197094808 -0.038033318103141894 0.14465401012275936"  rpy="3.141592653589793 -0.8156254715855257 -0.7064573024767364" />
+   <material  name="branch_0_leaf_34_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.026103348693457e-05"  iyz="0.0"  iyy="9.026103348693457e-05"  izz="9.026103348693457e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_34_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_34" />
+ </joint>
+ <link  name="branch_0_leaf_35" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01521784874643008"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <origin  xyz="-0.02790193532406072 -0.041490746018503125 0.025932035960691824"  rpy="3.141592653589793 -0.8515158554893207 -0.5920203851768191" />
+   <material  name="branch_0_leaf_35_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.789581565566662e-05"  iyz="0.0"  iyy="8.789581565566662e-05"  izz="8.789581565566662e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_35_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_35" />
+ </joint>
+ <link  name="branch_0_leaf_36" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.006870406514615552"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <origin  xyz="0.007958529579254456 0.04936255470431136 0.10094018809421218"  rpy="-1.3877787807814457e-17 -0.9221563579525333 -0.15985047693551185" />
+   <material  name="branch_0_leaf_36_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.222744953594999e-05"  iyz="0.0"  iyy="8.222744953594999e-05"  izz="8.222744953594999e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_36_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_36" />
+ </joint>
+ <link  name="branch_0_leaf_37" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015954040893595763"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <origin  xyz="-0.04357782084593747 -0.02451476147792138 0.1195588544270279"  rpy="3.141592653589793 -0.6356765838760249 -1.0583678678004558" />
+   <material  name="branch_0_leaf_37_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.843172876534101e-05"  iyz="0.0"  iyy="8.843172876534101e-05"  izz="8.843172876534101e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_37_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_37" />
+ </joint>
+ <link  name="branch_0_leaf_38" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.008301370211279415"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <origin  xyz="0.048721887051536926 0.01123288574397864 0.30568648490618816"  rpy="0.0 -0.3628562164389583 -1.3442045690757873" />
+   <material  name="branch_0_leaf_38_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011953630911906184"  iyz="0.0"  iyy="0.00011953630911906184"  izz="0.00011953630911906184"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_38_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_38" />
+ </joint>
+ <link  name="branch_0_leaf_39" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.007062126874981674"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <origin  xyz="-0.0059534831905219245 0.04964429511938077 0.4176668247210529"  rpy="0.0 -0.9244373823402934 0.1193528274931718" />
+   <material  name="branch_0_leaf_39_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  radius="0.01"  length="0.5" />
+   </geometry>
+   <origin  xyz="0 0 0.25"  rpy="0 0 0" />
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011745860195136951"  iyz="0.0"  iyy="0.00011745860195136951"  izz="0.00011745860195136951"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="branch_0_leaf_39_joint"  type="fixed" >
+  <parent  link="branch_0" />
+  <child  link="branch_0_leaf_39" />
+ </joint>
+ <link  name="cluster_2" />
+ <joint  name="cluster_2_joint"  type="fixed" >
+  <parent  link="target" />
+  <child  link="cluster_2" />
+  <origin  xyz="0.0 0.0 0.0"  rpy="0.0 0.0 -0.7853981633974483" />
+ </joint>
+ <link  name="cluster_2_leaf_0_link_x" />
+ <link  name="cluster_2_leaf_0_link_y" />
+ <link  name="cluster_2_leaf_0_link_z" />
+ <link  name="cluster_2_leaf_0" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015819503217684605"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_0_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.015819503217684605"  filename="./vine/leaf_2.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.752136489551766e-05"  iyz="0.0"  iyy="8.752136489551766e-05"  izz="8.752136489551766e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_0_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_0_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.06740579539194846 0.07507795787056364 0.28252390870431593"  rpy="1.6296156285889758 0.3381264995786482 1.0148825496997813" />
+ </joint>
+ <joint  name="cluster_2_leaf_0_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_0_link_x" />
+  <child  link="cluster_2_leaf_0_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_0_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_0_link_y" />
+  <child  link="cluster_2_leaf_0_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_0_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_0_link_z" />
+  <child  link="cluster_2_leaf_0" />
+ </joint>
+ <link  name="cluster_2_leaf_1_link_x" />
+ <link  name="cluster_2_leaf_1_link_y" />
+ <link  name="cluster_2_leaf_1_link_z" />
+ <link  name="cluster_2_leaf_1" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015685700007764744"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_1_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.015685700007764744"  filename="./vine/leaf_5.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.470438246263305e-05"  iyz="0.0"  iyy="8.470438246263305e-05"  izz="8.470438246263305e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_1_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_1_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.028317090776388717 0.0021845823761587205 0.2986525907635886"  rpy="1.491782120152742 -0.05245899382277203 0.9088752436865752" />
+ </joint>
+ <joint  name="cluster_2_leaf_1_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_1_link_x" />
+  <child  link="cluster_2_leaf_1_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_1_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_1_link_y" />
+  <child  link="cluster_2_leaf_1_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_1_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_1_link_z" />
+  <child  link="cluster_2_leaf_1" />
+ </joint>
+ <link  name="cluster_2_leaf_2_link_x" />
+ <link  name="cluster_2_leaf_2_link_y" />
+ <link  name="cluster_2_leaf_2_link_z" />
+ <link  name="cluster_2_leaf_2" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.0171702773307728"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_2_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.0171702773307728"  filename="./vine/leaf_5.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.06746214618145e-05"  iyz="0.0"  iyy="9.06746214618145e-05"  izz="9.06746214618145e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_2_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_2_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.010873409851649774 0.0015350252939779977 0.29979895372656806"  rpy="1.5969158477423595 0.025658888891258533 0.9347083214717141" />
+ </joint>
+ <joint  name="cluster_2_leaf_2_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_2_link_x" />
+  <child  link="cluster_2_leaf_2_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_2_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_2_link_y" />
+  <child  link="cluster_2_leaf_2_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_2_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_2_link_z" />
+  <child  link="cluster_2_leaf_2" />
+ </joint>
+ <link  name="cluster_2_leaf_3_link_x" />
+ <link  name="cluster_2_leaf_3_link_y" />
+ <link  name="cluster_2_leaf_3_link_z" />
+ <link  name="cluster_2_leaf_3" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01804425840308406"  filename="./vine/leaf_2.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_3_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.01804425840308406"  filename="./vine/leaf_2.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.275997756468832e-05"  iyz="0.0"  iyy="8.275997756468832e-05"  izz="8.275997756468832e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_3_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_3_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.015204867470270443 -0.02991318393223067 0.2981174490569917"  rpy="1.670797505050491 -0.050713233570558514 0.9380788463195483" />
+ </joint>
+ <joint  name="cluster_2_leaf_3_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_3_link_x" />
+  <child  link="cluster_2_leaf_3_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_3_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_3_link_y" />
+  <child  link="cluster_2_leaf_3_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_3_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_3_link_z" />
+  <child  link="cluster_2_leaf_3" />
+ </joint>
+ <link  name="cluster_2_leaf_4_link_x" />
+ <link  name="cluster_2_leaf_4_link_y" />
+ <link  name="cluster_2_leaf_4_link_z" />
+ <link  name="cluster_2_leaf_4" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01085218763696017"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_4_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.01085218763696017"  filename="./vine/leaf_1.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.000115403944405756"  iyz="0.0"  iyy="0.000115403944405756"  izz="0.000115403944405756"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_4_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_4_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.20006413914735685 0.021192043593575217 0.22254266448381316"  rpy="1.0301756729727043 -0.5252575600415188 0.7693389916675459" />
+ </joint>
+ <joint  name="cluster_2_leaf_4_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_4_link_x" />
+  <child  link="cluster_2_leaf_4_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_4_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_4_link_y" />
+  <child  link="cluster_2_leaf_4_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_4_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_4_link_z" />
+  <child  link="cluster_2_leaf_4" />
+ </joint>
+ <link  name="cluster_2_leaf_5_link_x" />
+ <link  name="cluster_2_leaf_5_link_y" />
+ <link  name="cluster_2_leaf_5_link_z" />
+ <link  name="cluster_2_leaf_5" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.017976473617212402"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_5_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.017976473617212402"  filename="./vine/leaf_0.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.020922175365394e-05"  iyz="0.0"  iyy="8.020922175365394e-05"  izz="8.020922175365394e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_5_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_5_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.13692307614778654 0.12646339023131062 0.2350725040268017"  rpy="1.878608113282108 0.605495215104825 1.2550997776232515" />
+ </joint>
+ <joint  name="cluster_2_leaf_5_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_5_link_x" />
+  <child  link="cluster_2_leaf_5_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_5_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_5_link_y" />
+  <child  link="cluster_2_leaf_5_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_5_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_5_link_z" />
+  <child  link="cluster_2_leaf_5" />
+ </joint>
+ <link  name="cluster_2_leaf_6_link_x" />
+ <link  name="cluster_2_leaf_6_link_y" />
+ <link  name="cluster_2_leaf_6_link_z" />
+ <link  name="cluster_2_leaf_6" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012786697805212995"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_6_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.012786697805212995"  filename="./vine/leaf_0.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.989312219037314e-05"  iyz="0.0"  iyy="8.989312219037314e-05"  izz="8.989312219037314e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_6_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_6_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.050492671091791945 -0.13275027119778654 0.26424960863344765"  rpy="1.9876257554410115 -0.27170895013405894 0.9083728479202825" />
+ </joint>
+ <joint  name="cluster_2_leaf_6_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_6_link_x" />
+  <child  link="cluster_2_leaf_6_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_6_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_6_link_y" />
+  <child  link="cluster_2_leaf_6_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_6_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_6_link_z" />
+  <child  link="cluster_2_leaf_6" />
+ </joint>
+ <link  name="cluster_2_leaf_7_link_x" />
+ <link  name="cluster_2_leaf_7_link_y" />
+ <link  name="cluster_2_leaf_7_link_z" />
+ <link  name="cluster_2_leaf_7" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.014107992021057853"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_7_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.014107992021057853"  filename="./vine/leaf_3.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011618024305915406"  iyz="0.0"  iyy="0.00011618024305915406"  izz="0.00011618024305915406"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_7_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_7_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.13494213383718123 -0.0789054498812287 0.25605575661271346"  rpy="1.4103498935882686 -0.5263940755177238 0.8407418948661716" />
+ </joint>
+ <joint  name="cluster_2_leaf_7_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_7_link_x" />
+  <child  link="cluster_2_leaf_7_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_7_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_7_link_y" />
+  <child  link="cluster_2_leaf_7_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_7_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_7_link_z" />
+  <child  link="cluster_2_leaf_7" />
+ </joint>
+ <link  name="cluster_2_leaf_8_link_x" />
+ <link  name="cluster_2_leaf_8_link_y" />
+ <link  name="cluster_2_leaf_8_link_z" />
+ <link  name="cluster_2_leaf_8" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.019736569786377958"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_8_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.019736569786377958"  filename="./vine/leaf_1.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.0001129028947778935"  iyz="0.0"  iyy="0.0001129028947778935"  izz="0.0001129028947778935"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_8_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_8_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.04851988146322691 0.19539184025820838 0.22241369081804557"  rpy="1.4827981460988222 0.7313719925830994 1.196062614868009" />
+ </joint>
+ <joint  name="cluster_2_leaf_8_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_8_link_x" />
+  <child  link="cluster_2_leaf_8_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_8_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_8_link_y" />
+  <child  link="cluster_2_leaf_8_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_8_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_8_link_z" />
+  <child  link="cluster_2_leaf_8" />
+ </joint>
+ <link  name="cluster_2_leaf_9_link_x" />
+ <link  name="cluster_2_leaf_9_link_y" />
+ <link  name="cluster_2_leaf_9_link_z" />
+ <link  name="cluster_2_leaf_9" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01531828770152419"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_9_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.01531828770152419"  filename="./vine/leaf_0.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010188823185285293"  iyz="0.0"  iyy="0.00010188823185285293"  izz="0.00010188823185285293"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_9_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_9_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.09826250612229215 0.16059105040256977 0.23357010600923606"  rpy="0.9331659545714903 0.24981117881039905 0.8711820927905856" />
+ </joint>
+ <joint  name="cluster_2_leaf_9_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_9_link_x" />
+  <child  link="cluster_2_leaf_9_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_9_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_9_link_y" />
+  <child  link="cluster_2_leaf_9_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_9_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_9_link_z" />
+  <child  link="cluster_2_leaf_9" />
+ </joint>
+ <link  name="cluster_2_leaf_10_link_x" />
+ <link  name="cluster_2_leaf_10_link_y" />
+ <link  name="cluster_2_leaf_10_link_z" />
+ <link  name="cluster_2_leaf_10" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012618937342188169"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_10_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.012618937342188169"  filename="./vine/leaf_4.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011826422236726789"  iyz="0.0"  iyy="0.00011826422236726789"  izz="0.00011826422236726789"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_10_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_10_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.13346352970475325 -0.03258664982550976 0.26669382537265096"  rpy="2.0232629367034343 0.15216516931374813 1.0290500285834696" />
+ </joint>
+ <joint  name="cluster_2_leaf_10_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_10_link_x" />
+  <child  link="cluster_2_leaf_10_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_10_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_10_link_y" />
+  <child  link="cluster_2_leaf_10_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_10_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_10_link_z" />
+  <child  link="cluster_2_leaf_10" />
+ </joint>
+ <link  name="cluster_2_leaf_11_link_x" />
+ <link  name="cluster_2_leaf_11_link_y" />
+ <link  name="cluster_2_leaf_11_link_z" />
+ <link  name="cluster_2_leaf_11" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01642659234654198"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_11_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.01642659234654198"  filename="./vine/leaf_3.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011628015720447816"  iyz="0.0"  iyy="0.00011628015720447816"  izz="0.00011628015720447816"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_11_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_11_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.09287097361572698 -0.025008672029785343 0.28416465048097306"  rpy="1.880635045565273 0.10421633236323403 0.9935789553784293" />
+ </joint>
+ <joint  name="cluster_2_leaf_11_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_11_link_x" />
+  <child  link="cluster_2_leaf_11_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_11_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_11_link_y" />
+  <child  link="cluster_2_leaf_11_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_11_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_11_link_z" />
+  <child  link="cluster_2_leaf_11" />
+ </joint>
+ <link  name="cluster_2_leaf_12_link_x" />
+ <link  name="cluster_2_leaf_12_link_y" />
+ <link  name="cluster_2_leaf_12_link_z" />
+ <link  name="cluster_2_leaf_12" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012551345323706341"  filename="./vine/leaf_3.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_12_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.012551345323706341"  filename="./vine/leaf_3.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00011910406746887767"  iyz="0.0"  iyy="0.00011910406746887767"  izz="0.00011910406746887767"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_12_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_12_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.0888863736484668 0.027255235700576932 0.2852303712905257"  rpy="1.2819101129790345 -0.1276074785962534 0.8686892229935553" />
+ </joint>
+ <joint  name="cluster_2_leaf_12_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_12_link_x" />
+  <child  link="cluster_2_leaf_12_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_12_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_12_link_y" />
+  <child  link="cluster_2_leaf_12_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_12_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_12_link_z" />
+  <child  link="cluster_2_leaf_12" />
+ </joint>
+ <link  name="cluster_2_leaf_13_link_x" />
+ <link  name="cluster_2_leaf_13_link_y" />
+ <link  name="cluster_2_leaf_13_link_z" />
+ <link  name="cluster_2_leaf_13" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.014029579522758497"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_13_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.014029579522758497"  filename="./vine/leaf_5.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.17830008852065e-05"  iyz="0.0"  iyy="8.17830008852065e-05"  izz="8.17830008852065e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_13_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_13_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.021560484756608985 0.053856407428678414 0.2943376171608655"  rpy="1.4036049046633075 0.10004547206269863 0.9151721337033458" />
+ </joint>
+ <joint  name="cluster_2_leaf_13_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_13_link_x" />
+  <child  link="cluster_2_leaf_13_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_13_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_13_link_y" />
+  <child  link="cluster_2_leaf_13_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_13_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_13_link_z" />
+  <child  link="cluster_2_leaf_13" />
+ </joint>
+ <link  name="cluster_2_leaf_14_link_x" />
+ <link  name="cluster_2_leaf_14_link_y" />
+ <link  name="cluster_2_leaf_14_link_z" />
+ <link  name="cluster_2_leaf_14" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.01773202586536152"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_14_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.01773202586536152"  filename="./vine/leaf_5.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="8.140602227729039e-05"  iyz="0.0"  iyy="8.140602227729039e-05"  izz="8.140602227729039e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_14_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_14_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.05445259792878198 0.028728742027777174 0.29361466918447354"  rpy="1.6674213689437762 0.1829996315787708 0.9748815060772473" />
+ </joint>
+ <joint  name="cluster_2_leaf_14_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_14_link_x" />
+  <child  link="cluster_2_leaf_14_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_14_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_14_link_y" />
+  <child  link="cluster_2_leaf_14_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_14_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_14_link_z" />
+  <child  link="cluster_2_leaf_14" />
+ </joint>
+ <link  name="cluster_2_leaf_15_link_x" />
+ <link  name="cluster_2_leaf_15_link_y" />
+ <link  name="cluster_2_leaf_15_link_z" />
+ <link  name="cluster_2_leaf_15" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012039056481416205"  filename="./vine/leaf_1.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_15_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.012039056481416205"  filename="./vine/leaf_1.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010303695707589169"  iyz="0.0"  iyy="0.00010303695707589169"  izz="0.00010303695707589169"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_15_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_15_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.12547165688742629 0.03412996950871077 0.27035533747137014"  rpy="1.886750922137085 0.3235396612503123 1.0649126821337664" />
+ </joint>
+ <joint  name="cluster_2_leaf_15_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_15_link_x" />
+  <child  link="cluster_2_leaf_15_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_15_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_15_link_y" />
+  <child  link="cluster_2_leaf_15_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_15_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_15_link_z" />
+  <child  link="cluster_2_leaf_15" />
+ </joint>
+ <link  name="cluster_2_leaf_16_link_x" />
+ <link  name="cluster_2_leaf_16_link_y" />
+ <link  name="cluster_2_leaf_16_link_z" />
+ <link  name="cluster_2_leaf_16" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.012526406429673701"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_16_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.012526406429673701"  filename="./vine/leaf_4.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.794800776980419e-05"  iyz="0.0"  iyy="9.794800776980419e-05"  izz="9.794800776980419e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_16_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_16_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="0.010289551003601691 0.037533533225030766 0.2974648870434791"  rpy="1.5244550006648265 0.12160464155950496 0.9380749990558623" />
+ </joint>
+ <joint  name="cluster_2_leaf_16_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_16_link_x" />
+  <child  link="cluster_2_leaf_16_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_16_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_16_link_y" />
+  <child  link="cluster_2_leaf_16_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_16_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_16_link_z" />
+  <child  link="cluster_2_leaf_16" />
+ </joint>
+ <link  name="cluster_2_leaf_17_link_x" />
+ <link  name="cluster_2_leaf_17_link_y" />
+ <link  name="cluster_2_leaf_17_link_z" />
+ <link  name="cluster_2_leaf_17" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.015174610688037327"  filename="./vine/leaf_4.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_17_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.015174610688037327"  filename="./vine/leaf_4.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="9.805389053895615e-05"  iyz="0.0"  iyy="9.805389053895615e-05"  izz="9.805389053895615e-05"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_17_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_17_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.10254676781953435 -0.0019761273185217873 0.2819224278601961"  rpy="1.312674997444045 -0.23745147292969468 0.8622595610398358" />
+ </joint>
+ <joint  name="cluster_2_leaf_17_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_17_link_x" />
+  <child  link="cluster_2_leaf_17_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_17_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_17_link_y" />
+  <child  link="cluster_2_leaf_17_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_17_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_17_link_z" />
+  <child  link="cluster_2_leaf_17" />
+ </joint>
+ <link  name="cluster_2_leaf_18_link_x" />
+ <link  name="cluster_2_leaf_18_link_y" />
+ <link  name="cluster_2_leaf_18_link_z" />
+ <link  name="cluster_2_leaf_18" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.017111499370899532"  filename="./vine/leaf_5.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_18_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.017111499370899532"  filename="./vine/leaf_5.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.0001081235059531679"  iyz="0.0"  iyy="0.0001081235059531679"  izz="0.0001081235059531679"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_18_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_18_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.0277777184448722 0.06547168440436585 0.29144786308918536"  rpy="1.3624621053989192 0.11869572535665923 0.9118574436104933" />
+ </joint>
+ <joint  name="cluster_2_leaf_18_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_18_link_x" />
+  <child  link="cluster_2_leaf_18_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_18_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_18_link_y" />
+  <child  link="cluster_2_leaf_18_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_18_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_18_link_z" />
+  <child  link="cluster_2_leaf_18" />
+ </joint>
+ <link  name="cluster_2_leaf_19_link_x" />
+ <link  name="cluster_2_leaf_19_link_y" />
+ <link  name="cluster_2_leaf_19_link_z" />
+ <link  name="cluster_2_leaf_19" >
+  <visual >
+   <geometry >
+    <mesh  scale="0.010522598400308883"  filename="./vine/leaf_0.stl" />
+   </geometry>
+   <material  name="cluster_2_leaf_19_material" >
+    <color  rgba="0 0.5 0 0.7" />
+   </material>
+  </visual>
+  <collision >
+   <geometry >
+    <mesh  scale="0.010522598400308883"  filename="./vine/leaf_0.stl" />
+   </geometry>
+  </collision>
+  <inertial >
+   <mass  value="0.03" />
+   <inertia  ixx="0.00010649505484563205"  iyz="0.0"  iyy="0.00010649505484563205"  izz="0.00010649505484563205"  ixz="0.0"  ixy="0.0" />
+  </inertial>
+ </link>
+ <joint  name="cluster_2_leaf_19_joint_x"  type="prismatic" >
+  <parent  link="cluster_2" />
+  <child  link="cluster_2_leaf_19_link_x" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="1 0 0" />
+  <origin  xyz="-0.13795776483152042 0.03384376023038439 0.2642390111549753"  rpy="1.1411417007409141 -0.25022642652279165 0.8347669883917481" />
+ </joint>
+ <joint  name="cluster_2_leaf_19_joint_y"  type="prismatic" >
+  <parent  link="cluster_2_leaf_19_link_x" />
+  <child  link="cluster_2_leaf_19_link_y" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 1 0" />
+ </joint>
+ <joint  name="cluster_2_leaf_19_joint_z"  type="prismatic" >
+  <parent  link="cluster_2_leaf_19_link_y" />
+  <child  link="cluster_2_leaf_19_link_z" />
+  <limit  lower="-5"  velocity="100"  upper="5"  effort="100" />
+  <axis  xyz="0 0 1" />
+ </joint>
+ <joint  name="cluster_2_leaf_19_joint"  type="fixed" >
+  <parent  link="cluster_2_leaf_19_link_z" />
+  <child  link="cluster_2_leaf_19" />
+ </joint>
+</robot>

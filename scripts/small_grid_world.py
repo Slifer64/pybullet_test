@@ -2,10 +2,45 @@ import numpy as np
 import enum
 
 
-class Policy (enum.Enum):
+class Policy:
 
-    MAX = 1
-    RANDOM = 2
+    def get(self):
+        pass
+
+
+class RandomPolicy(Policy):
+
+    def __init__(self, states, actions):
+
+        n_states = len(states)
+        n_act = len(actions)
+
+        # P = np.ones((n_states,n_act)) * (1.0 / n_act)
+        # P = { state: np.ones(n_act)/n_act for state in states }
+
+        self.__policy = {}
+        for state in states:
+            self.__policy[state] = {}
+            for act in actions:
+                self.__policy[state][act] = 1.0 / n_act
+
+    def get(self, state, action):
+
+        return self.__policy[state][action]
+
+    def __str__(self):
+
+        return str(self.__policy)
+
+
+# def greedyPolicy(states, actions, V):
+#
+#     n_states = len(states)
+#     n_act = len(actions)
+#
+#     P = np.zeros((n_states, n_act)) * (1.0 / n_act)
+#
+#     return P
 
 
 # ============= Policy Evaluation ==============
@@ -23,14 +58,12 @@ def policyEvaluation(world, policy, gamma, zero_tol=1e-3, max_iter=100):
 
     while iter < max_iter:
         for s in world.States:
-            q = np.zeros(n_act)
+            v_temp = 0.
             for i,a in enumerate(world.Actions):
                 R, s_new = world.step(s, a)
-                q[i] = R + gamma*V[s_new[0],s_new[1]]
-            if policy == Policy.MAX:
-                V_new[s[0], s[1]] = np.amax(q)
-            elif policy == Policy.RANDOM:
-                V_new[s[0], s[1]] = np.sum(q) / len(q)
+                p = policy.get(s,a)
+                v_temp += p*(R + gamma*V[s_new[0],s_new[1]])
+            V_new[s[0],s[1]] = v_temp
 
         err = np.amax(np.abs(V_new - V))
         V = V_new.copy()
@@ -44,7 +77,7 @@ def policyEvaluation(world, policy, gamma, zero_tol=1e-3, max_iter=100):
 
 
 # ============= Policy Iteration ==============
-def policyIteration(world, gamma, zero_tol=1e-3, max_iter=100):
+# def policyIteration(world, gamma, zero_tol=1e-3, max_iter=100):
 
 
 # ============================================
@@ -56,7 +89,7 @@ class GridWorld:
 
         self.m, self.n = grid_size
 
-        self.States = [ ( int( state_id / self.n) , state_id % self.n) for state_id in range(self.m * self.n) ]
+        self.States = [ self.ind2state(ind) for ind in range(self.m * self.n) ]
 
         self.Actions = [ "north", "east", "south", "west" ]
         
@@ -106,6 +139,14 @@ class GridWorld:
         else:
             return False
 
+    def state2ind(self, state):
+
+        return state[0]*self.n + state[1]
+
+    def ind2state(self, ind):
+
+        return int(ind/self.n) , ind%self.n
+
     def __str__(self):
 
         return "States: " + str(self.States) + "\n" \
@@ -125,7 +166,9 @@ if __name__ == '__main__':
     # R, new_s = grid_world.step(s, act)
     # print("state:", s, ", action:", act, ", new_state:", new_s, ", R:", R)
 
-    V, err, iter = policyEvaluation(grid_world, policy=Policy.RANDOM, gamma=1.0, zero_tol=1e-3, max_iter=150)
+    # print(RandomPolicy(grid_world.States, grid_world.Actions))
+
+    V, err, iter = policyEvaluation(grid_world, policy=RandomPolicy(grid_world.States, grid_world.Actions), gamma=1.0, zero_tol=1e-3, max_iter=150)
 
     print(V)
     print("Error:",err, ", iterations:",iter)

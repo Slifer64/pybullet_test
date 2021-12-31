@@ -75,8 +75,30 @@ class GridWorld:
         return int(ind / self.n), ind % self.n
 
     @staticmethod
-    def valueFunctionAsMatrix():
-        pass
+    def valueFunctionAsMatrix(value_fun, world) -> np.array(float):
+        assert isinstance(value_fun, ValueFunction)
+        assert isinstance(world, GridWorld)
+
+        vmat = np.zeros(world.size())
+        for state in world.states:
+            vmat[state[0], state[1]] = value_fun.get(state)
+        return vmat
+
+    @staticmethod
+    def policyAsMatrix(policy, world) -> np.array(str):
+        assert isinstance(policy, Policy)
+        assert isinstance(world, GridWorld)
+
+        act_symb = {"north": '↑', "east": '→', "south": '↓', "west": '←'}
+
+        act_mat = np.empty_like(np.zeros(world.size()), dtype=str)
+        for state in world.states:
+            if world.isTerminal(state):
+                act_mat[state[0], state[1]] = 'x'
+            else:
+                # _, act = policy.getMax(state)
+                act_mat[state[0], state[1]] = act_symb.get(policy.getMax(state)[1])
+        return act_mat
 
     def __str__(self):
 
@@ -131,11 +153,13 @@ class Policy:
     def __init__(self):
 
         self.__policy = {}
+        self.__actions = []
 
     @classmethod
     def Random(cls, world):
 
         obj = cls()
+        obj.__actions = world.actions.copy()
         prob = 1.0 / len(world.actions)
         obj.__policy = {}
         for state in world.states:
@@ -148,6 +172,7 @@ class Policy:
     def Greedy(cls, world, value_fun: ValueFunction):
 
         obj = cls()
+        obj.__actions = world.actions.copy()
         obj.__policy = {}
         for state in world.states:
             obj.__policy[state] = {}
@@ -167,6 +192,18 @@ class Policy:
     def get(self, state, action):
 
         return self.__policy[state][action]
+
+    def getMax(self, state):
+
+        best_act = None
+        best_prob = -1e6
+        for action in self.__actions:
+            prob = self.get(state, action)
+            if prob > best_prob:
+                best_prob = prob
+                best_act = action
+
+        return best_prob, best_act
 
     def isEqual(self, other_policy) -> bool:
 
@@ -188,16 +225,6 @@ class Policy:
         cp = Policy()
         cp.__policy = self._Policy__policy.copy()
         return cp
-
-
-def valueFunctionAsMatrix(value_fun: ValueFunction, states: [State]) -> np.array(float):
-    m = max([state[0] for state in states]) + 1
-    n = max([state[1] for state in states]) + 1
-
-    vmat = np.zeros((m, n))
-    for state in states:
-        vmat[state[0], state[1]] = value_fun.get(state)
-    return vmat
 
 
 # ============= Policy Evaluation ==============
@@ -265,24 +292,20 @@ if __name__ == '__main__':
     # R, new_s = grid_world.step(s, act)
     # print("state:", s, ", action:", act, ", new_state:", new_s, ", R:", R)
 
+    print("=========== Policy Evaluation ===========")
     V, err, iter = policyEvaluation(grid_world, policy=Policy.Random(grid_world), gamma=1.0,
                                     zero_tol=1e-3, max_iter=150)
 
-    vmat = valueFunctionAsMatrix(V, grid_world.states)
-    print(vmat)
+    print("Value function:\n", GridWorld.valueFunctionAsMatrix(V, grid_world))
     print("Error:", err, ", iterations:", iter)
 
+    print("=========== Policy Iteration ===========")
+
     opt_policy, iter = policyIteration(grid_world, gamma=1.0, max_outer_iter=20, max_inner_iter=100, zero_tol=1e-3)
+    print("Optimal policy:\n", GridWorld.policyAsMatrix(opt_policy, grid_world))
+    print("Iterations:", iter)
 
-    print("-----")
-    print("|→|↓|")
-    print("-----")
-    print("|→|↓|")
-    print("-----")
+    V_opt, err, iter = policyEvaluation(grid_world, policy=opt_policy, gamma=1.0, zero_tol=1e-3, max_iter=150)
+    print("Optimal Value function:\n", GridWorld.valueFunctionAsMatrix(V, grid_world))
+    print("Error:", err, ", iterations:", iter)
 
-    # act_symb = {"north": '↑', "east": '→', "south": '↓', "west": '←'}
-    #
-    # A = [['↑', '↓', '→', '←'], ['↑', '↓', '→', '←'], ['↑', '↓', '→', '←'], ['↑', '↓', '→', '←']]
-    # m, n = 4, 4
-    # for i in range(m):
-    #     for j in range(n):

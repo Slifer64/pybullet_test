@@ -4,6 +4,7 @@ import abc
 
 State = (int, int)
 
+
 # ============================================
 # ============= GridWorld class ==============
 # ============================================
@@ -73,6 +74,10 @@ class GridWorld:
 
         return int(ind / self.n), ind % self.n
 
+    @staticmethod
+    def valueFunctionAsMatrix():
+        pass
+
     def __str__(self):
 
         return "States: " + str(self.states) + "\n" \
@@ -104,7 +109,7 @@ class ValueFunction:
 
         err = 0.
         for state in self.state_value_dict.keys():
-            temp_err = abs( self.get(state) - other_value_fun.get(state) )
+            temp_err = abs(self.get(state) - other_value_fun.get(state))
             if temp_err > err:
                 err = temp_err
         return err
@@ -123,65 +128,66 @@ class ValueFunction:
 # =========================================
 class Policy:
 
-    @abc.abstractmethod
-    def get(self):
-        raise RuntimeError("Abstract method must be overridden!")
-
-
-# ===============================================
-# ============= RandomPolicy class ==============
-# ===============================================
-class RandomPolicy(Policy):
-
-    def __init__(self, states, actions):
-
-        n_states = len(states)
-        n_act = len(actions)
-
-        # P = np.ones((n_states,n_act)) * (1.0 / n_act)
-        # P = { state: np.ones(n_act)/n_act for state in states }
+    def __init__(self):
 
         self.__policy = {}
-        for state in states:
-            self.__policy[state] = {}
-            for act in actions:
-                self.__policy[state][act] = 1.0 / n_act
 
-    def get(self, state, action):
+    @classmethod
+    def Random(cls, world):
 
-        return self.__policy[state][action]
-
-    def __str__(self):
-
-        return str(self.__policy)
-
-
-# ===============================================
-# ============= RandomPolicy class ==============
-# ===============================================
-class GreedyPolicy(Policy):
-
-    def __init__(self, world, value_fun: ValueFunction):
-
-        n_states = len(world.states)
-        n_act = len(world.actions)
-
-        self.__policy = {}
+        obj = cls()
+        prob = 1.0 / len(world.actions)
+        obj.__policy = {}
         for state in world.states:
-            self.__policy[state] = {}
+            obj.__policy[state] = {}
+            for act in world.actions:
+                obj.__policy[state][act] = prob
+        return obj
+
+    @classmethod
+    def Greedy(cls, world, value_fun: ValueFunction):
+
+        obj = cls()
+        obj.__policy = {}
+        for state in world.states:
+            obj.__policy[state] = {}
+            best_act = None
+            v_best = -1e10
             for act in world.actions:
                 _, s_new = world.step(state, act)
                 v = value_fun.get(s_new)
-                self.__policy[state][act] = 0.0
-            
+                if v > v_best:
+                    best_act = act
+                    v_best = v
+                obj.__policy[state][act] = 0.0
+
+            obj.__policy[state][best_act] = 1.0
+        return obj
 
     def get(self, state, action):
 
         return self.__policy[state][action]
 
+    def isEqual(self, other_policy) -> bool:
+
+        for state in self.__policy.keys():
+            for act in self.__policy[state].keys():
+                if self.__policy[state][act] != other_policy.get(state, act):
+                    return False
+        else:
+            return True
+
+    def copy(self):
+        return self.__copy__()
+
     def __str__(self):
 
         return str(self.__policy)
+
+    def __copy__(self):
+        cp = Policy()
+        cp.__policy = self._Policy__policy.copy()
+        return cp
 
 
 def valueFunctionAsMatrix(value_fun: ValueFunction, states: [State]) -> np.array(float):
@@ -229,6 +235,24 @@ def policyEvaluation(world, policy: Policy, gamma, zero_tol=1e-3, max_iter=100) 
     return V, err, iter
 
 
+# ============= Policy Iteration ==============
+def policyIteration(world, gamma, max_outer_iter=20, max_inner_iter=100, zero_tol=1e-3) -> (Policy, int):
+
+    policy = Policy.Random(world)
+    prev_policy = policy.copy()
+
+    iterations = 0
+
+    while iterations < max_outer_iter:
+        value_fun, _, _ = policyEvaluation(world, policy, gamma, zero_tol, max_inner_iter)
+        policy = Policy.Greedy(world, value_fun)
+        if policy.isEqual(prev_policy):
+            break
+        prev_policy = policy.copy()
+        iterations += 1
+
+    return policy, iterations
+
 # =================================
 # ============= MAIN ==============
 # =================================
@@ -241,13 +265,24 @@ if __name__ == '__main__':
     # R, new_s = grid_world.step(s, act)
     # print("state:", s, ", action:", act, ", new_state:", new_s, ", R:", R)
 
-    # print(RandomPolicy(grid_world.states, grid_world.actions))
-
-    V, err, iter = policyEvaluation(grid_world, policy=RandomPolicy(grid_world.states, grid_world.actions), gamma=1.0,
+    V, err, iter = policyEvaluation(grid_world, policy=Policy.Random(grid_world), gamma=1.0,
                                     zero_tol=1e-3, max_iter=150)
 
     vmat = valueFunctionAsMatrix(V, grid_world.states)
     print(vmat)
     print("Error:", err, ", iterations:", iter)
 
-    # print( grid_world._GridWorld__Actions_act )
+    opt_policy, iter = policyIteration(grid_world, gamma=1.0, max_outer_iter=20, max_inner_iter=100, zero_tol=1e-3)
+
+    print("-----")
+    print("|→|↓|")
+    print("-----")
+    print("|→|↓|")
+    print("-----")
+
+    # act_symb = {"north": '↑', "east": '→', "south": '↓', "west": '←'}
+    #
+    # A = [['↑', '↓', '→', '←'], ['↑', '↓', '→', '←'], ['↑', '↓', '→', '←'], ['↑', '↓', '→', '←']]
+    # m, n = 4, 4
+    # for i in range(m):
+    #     for j in range(n):

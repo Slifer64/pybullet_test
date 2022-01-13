@@ -14,7 +14,9 @@ setup(name='pybullet_test',
                         'opencv-python', \
                         'matplotlib==3.0.3', \
                         'scipy', \
-                        'open3d==0.8.0',
-                        'PyYAML'\
+                        'open3d==0.8.0', \
+                        'PyYAML', \
+                        'torch', \
+                        'tensorflow'
       ]
 )

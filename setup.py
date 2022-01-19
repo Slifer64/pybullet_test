@@ -17,7 +17,7 @@ setup(name='pybullet_test',
                         'open3d==0.8.0', \
                         'PyYAML', \
                         'torch', \
-                        'torchvision', \
+                        'torchvision == 0.5.0', \
                         'tensorflow'
       ]
 )

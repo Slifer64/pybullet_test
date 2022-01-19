@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-# import torchvision
+import torchvision
 import numpy as np
 
 class Net(nn.Module):
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     # for param in model.parameters():
     #     param.requires_grad = False
 
-    # model = torchvision.models.resnet18(pretrained=True)
+    model = torchvision.models.resnet18(pretrained=True)
     # data = torch.rand(1, 3, 64, 64)
     # labels = torch.rand(1, 1000)
     #

@@ -3,6 +3,9 @@ install/deps/eigen3
 
 pybullet_test.egg-info/
 
+scripts/pytorch/data/
+
+venv/
 env/
 .catkin_workspace
 .idea/

@@ -8,14 +8,44 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
 
+import time
+
+
+class Timer:
+
+    def __init__(self):
+
+        self.t_start = time.time()
+        self.t_end = time.time()
+
+    def tic(self):
+
+        self.t_start = time.time()
+
+    def toc(self, format='sec'):
+
+        self.t_end = time.time()
+        elaps_t = self.t_end - self.t_start
+
+        if format == 'sec':
+            return elaps_t
+        elif format == 'milli':
+            return elaps_t*1e3
+        elif format == 'micro':
+            return elaps_t * 1e6
+        elif format == 'nano':
+            return elaps_t * 1e9
+        else:
+            raise RuntimeError('Unsupported format {0:s}'.format(format))
+
 
 class Net(nn.Module):
 
     def __init__(self):
         super().__init__()
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.conv1 = nn.Conv2d(3, 12, 5)
+        self.conv2 = nn.Conv2d(12, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
@@ -41,7 +71,7 @@ def imshow(img):
     plt.show()
 
 
-def trainModel(transform, batch_size, classes, model_path):
+def trainModel(transform, batch_size, classes, model_path, device='cpu'):
 
     # ============  1. Load and normalize CIFAR10  ============
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
@@ -59,18 +89,21 @@ def trainModel(transform, batch_size, classes, model_path):
 
     # ============  2. Define a Convolutional Neural Network  ============
     net = Net()
+    net.to(device)
 
     # ============  3. Define a Loss function and optimizer  ============
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
+    timer = Timer()
+    timer.tic()
     # ============  4. Train the network  ============
     for epoch in range(2):  # loop over the dataset multiple times
 
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
+            inputs, labels = data[0].to(device), data[1].to(device)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -89,13 +122,14 @@ def trainModel(transform, batch_size, classes, model_path):
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
                 running_loss = 0.0
 
+    print('Elapsed time %.4f sec' % (timer.toc()))
     print('Finished Training')
 
     # ============  Save the model  ============
     torch.save(net.state_dict(), model_path)
 
 
-def testModel(transform, batch_size, classes, model_path):
+def testModel(transform, batch_size, classes, model_path, device='cpu'):
 
     # ============  5. Test the network on the test data  ============
 
@@ -104,10 +138,10 @@ def testModel(transform, batch_size, classes, model_path):
 
     net = Net()
     net.load_state_dict(torch.load(model_path))
+    net.to(device)
 
-    data_iter = iter(test_loader)
-    images, labels = data_iter.next()
-
+    # data_iter = iter(test_loader)
+    # images, labels = data_iter.next()
     # # print images
     # imshow(torchvision.utils.make_grid(images))
     # print('GroundTruth: ', *['{0:5s}'.format(classes[labels[j]]) for j in range(batch_size)])
@@ -120,7 +154,7 @@ def testModel(transform, batch_size, classes, model_path):
     # since we're not training, we don't need to calculate the gradients for our outputs
     with torch.no_grad():
         for data in test_loader:
-            images, labels = data
+            images, labels = data[0].to(device), data[1].to(device)
             # # calculate outputs by running images through the network
             # outputs = net(images)
             # # the class with the highest energy is what we choose as prediction
@@ -135,10 +169,13 @@ def testModel(transform, batch_size, classes, model_path):
     correct_pred = {classname: 0 for classname in classes}
     total_pred = {classname: 0 for classname in classes}
 
+    timer = Timer()
+    timer.tic()
+
     # again no gradients needed
     with torch.no_grad():
         for data in test_loader:
-            images, labels = data
+            images, labels = data[0].to(device), data[1].to(device)
             # outputs = net(images)
             # _, predictions = torch.max(outputs, 1)
             predictions = net.predict(images)
@@ -148,6 +185,8 @@ def testModel(transform, batch_size, classes, model_path):
                 #     correct_pred[classes[label]] += 1
                 correct_pred[classes[label]] += label == prediction
                 total_pred[classes[label]] += 1
+
+    print('Elapsed time %.4f sec' % (timer.toc()))
 
     # print accuracy for each class
     print('-' * (1 + 7 + 3 + 10 + 1))
@@ -161,12 +200,17 @@ def testModel(transform, batch_size, classes, model_path):
 
 if __name__ == '__main__':
 
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    # device = 'cpu'
+
+    print('Device:', device)
+
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
     model_path = './data/cifar_net.pth'
 
-    # trainModel(transform=transform, batch_size=4, classes=classes, model_path=model_path)
-    testModel(transform=transform, batch_size=1000, classes=classes, model_path=model_path)
+    trainModel(transform=transform, batch_size=4, classes=classes, model_path=model_path, device=device)
+    testModel(transform=transform, batch_size=1000, classes=classes, model_path=model_path, device=device)
 
 
 

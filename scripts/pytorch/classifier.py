@@ -41,14 +41,14 @@ class Timer:
 
 class Net(nn.Module):
 
-    def __init__(self):
+    def __init__(self, n_classes):
         super().__init__()
         self.pool = nn.MaxPool2d(2, 2)
         self.conv1 = nn.Conv2d(3, 12, 5)
         self.conv2 = nn.Conv2d(12, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.fc3 = nn.Linear(84, n_classes)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -88,7 +88,7 @@ def trainModel(transform, batch_size, classes, model_path, device='cpu'):
     # imshow(torchvision.utils.make_grid(images))
 
     # ============  2. Define a Convolutional Neural Network  ============
-    net = Net()
+    net = Net(len(classes))
     net.to(device)
 
     # ============  3. Define a Loss function and optimizer  ============
@@ -136,7 +136,7 @@ def testModel(transform, batch_size, classes, model_path, device='cpu'):
     test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=2)
 
-    net = Net()
+    net = Net(len(classes))
     net.load_state_dict(torch.load(model_path))
     net.to(device)
 
@@ -195,6 +195,28 @@ def testModel(transform, batch_size, classes, model_path, device='cpu'):
     for classname, correct_count in correct_pred.items():
         accuracy = 100 * float(correct_count) / total_pred[classname]
         print('|%7s | %8.1f %%|' % (classname, accuracy))
+
+    # correct = 0
+    # total = 0
+    # class_stats = {class_name: [0, 0] for class_name in classes}
+    # with torch.no_grad():
+    #
+    #     for data in test_loader:
+    #
+    #         inputs, labels = data
+    #
+    #         predictions = net.predict(inputs)
+    #
+    #         total += labels.size(0)
+    #         correct += (labels == predictions).sum().item()
+    #
+    #         for prediction, label in zip(predictions, labels):
+    #             class_stats[classes[label]][0] += prediction == label
+    #             class_stats[classes[label]][1] += 1
+    #
+    # print('Test set accuracy: %.1f %%' % (100. * correct / total))
+    # for class_name, stats in class_stats.items():
+    #     print('%6s: %.2f %%' % (class_name, 100. * stats[0] / stats[1]))
 
 
 

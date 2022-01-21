@@ -4,8 +4,125 @@ import torch
 import matplotlib.pyplot as plt
 
 
-def trainInNumpy():
+def plotResults(x, y, y_pred):
+    fig, ax = plt.subplots()
+    ax.plot(x, y_pred, label='y_pred', color='magenta', linestyle='-', linewidth=2)
+    ax.plot(x, y, label='y', color='blue', linestyle='--', linewidth=2)
+    ax.set_xlabel('input x')
+    ax.set_ylabel('output y')
+    ax.set_title('sine fitting')
+    ax.legend()
+    plt.show()
 
+
+class MyMSELoss:
+
+    def __init__(self, reduction='sum'):
+
+        if reduction == 'sum':
+            self.reduction_fun = lambda y_pred, y: (y - y_pred).pow(2).sum()
+        elif reduction == 'mean':
+            self.reduction_fun = lambda y_pred, y: (y - y_pred).pow(2).mean()
+        else:
+            raise RuntimeError('Invalid reduction: %s' % reduction)
+
+    def __call__(self, y_pred, y):
+
+        return self.reduction_fun(y_pred, y)
+
+
+class MyOptimizer:
+
+    def __init__(self, parameters, learning_rate):
+        self.parameters = [param for param in parameters]
+        self.lr = learning_rate
+
+    def zero_grad(self):
+        for param in self.parameters:
+            param.grad = None
+
+    def step(self):
+        with torch.no_grad():
+            for param in self.parameters:
+                param -= self.lr * param.grad
+
+
+class Polynomial3(torch.nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.a = torch.nn.Parameter(torch.randn(()))  # requires_grad=True by default
+        self.b = torch.nn.Parameter(torch.randn(()))
+        self.c = torch.nn.Parameter(torch.randn(()))
+        self.d = torch.nn.Parameter(torch.randn(()))
+
+    def forward(self, x):
+        return self.a + self.b * x + self.c * x**2 + self.d * x**3
+
+    def string(self):
+        return 'y = {0:.1f} + {1:.1f}x + {2:.1f}x^2 + {3:.1f}x^3'.\
+            format(self.a.item(), self.b.item(), self.c.item(), self.d.item())
+
+
+class PolynomialNN(torch.nn.Module):
+
+    def __init__(self, n):
+        super().__init__()
+
+        self.n = n
+        # nn.Sequential contains other Modules, and applies them in sequence
+        # The Linear Module holds internal Tensors for its weight and bias.
+        # The Flatten layer flattens the output of the linear layer to a 1D tensor
+        self.net = torch.nn.Sequential(
+            torch.nn.Linear(n, 1, bias=True),  # bias:a, n params ai, each for ai*x^i, i=1...n
+            torch.nn.Flatten(0, 1)  # (first dim to flatten, last dim to flatten)
+        )
+
+    def forward(self, x):
+        # the output y is a linear function of (x, x^2, x^3), so we can consider it as a linear layer neural network.
+        xx = x.unsqueeze(-1).pow(torch.arange(start=1, end=self.n+1, step=1))
+        return self.net(xx)
+
+    def string(self):
+        linear_layer = self.net[0]
+        a0 = linear_layer.bias.item()
+        coeff = [linear_layer.weight[:, i].item() for i in range(self.n)]
+
+        y_str = '{0:.1f}'.format(a0)
+        if self.n > 0:
+            y_str += ' + {0:.1f}x'.format(coeff[0])
+        for i in range(1, self.n):
+            y_str += ' + {0:.1f}x^{1:d}'.format(coeff[i], i+1)
+
+        return y_str
+
+
+class DynamicNet(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.a = torch.nn.Parameter(torch.randn(()))
+        self.b = torch.nn.Parameter(torch.randn(()))
+        self.c = torch.nn.Parameter(torch.randn(()))
+        self.d = torch.nn.Parameter(torch.randn(()))
+        self.e = torch.nn.Parameter(torch.randn(()))
+
+    def forward(self, x):
+        """
+        For the forward pass of the model, we randomly choose either 4, 5
+        and reuse the e parameter to compute the contribution of these orders.
+        Here we also see that it is perfectly safe to reuse the same parameter many
+        times when defining a computational graph.
+        """
+        y = self.a + self.b * x + self.c * x**2 + self.d * x**3
+        for exp in range(4, np.random.randint(4, 6)):
+            y = y + self.e * x ** exp
+        return y
+
+    def string(self):
+        return 'y = {0:.1f} + {1:.1f}x + {2:.1f}x^2 + {3:.1f}x^3 + ({3:.1f}x^4)? + ({3:.1f}x^5)?'.\
+            format(self.a.item(), self.b.item(), self.c.item(), self.d.item(), self.e.item(), self.e.item())
+
+def trainInNumpy():
     x = np.linspace(-np.pi, np.pi, 2000)
     y = np.sin(x)
 
@@ -18,16 +135,16 @@ def trainInNumpy():
 
     for i in range(3000):
 
-        y_pred = a + b*x + c*x**2 + d*x**3
-        loss = np.square(y_pred-y).sum()
+        y_pred = a + b * x + c * x ** 2 + d * x ** 3
+        loss = np.square(y_pred - y).sum()
 
-        grad_y_pred = 2*(y_pred - y)
+        grad_y_pred = 2 * (y_pred - y)
         grad_a = np.sum(grad_y_pred)
         grad_b = np.sum(grad_y_pred * x)
-        grad_c = np.sum(grad_y_pred * x**2)
-        grad_d = np.sum(grad_y_pred * x**3)
+        grad_c = np.sum(grad_y_pred * x ** 2)
+        grad_d = np.sum(grad_y_pred * x ** 3)
 
-        a -= lr*grad_a
+        a -= lr * grad_a
         b -= lr * grad_b
         c -= lr * grad_c
         d -= lr * grad_d
@@ -37,15 +154,10 @@ def trainInNumpy():
 
     print('Finished!')
 
-    fig, ax = plt.subplots()
-    ax.plot(x, y_pred, label='y_pred', color='magenta', linestyle='-', linewidth=2)
-    ax.plot(x, y, label='y', color='blue', linestyle='--', linewidth=2)
-    ax.legend()
-    plt.show()
+    plotResults(x, y, y_pred)
 
 
 def trainInTorch():
-
     x = torch.linspace(-np.pi, np.pi, 2000)
     y = torch.sin(x)
 
@@ -75,60 +187,49 @@ def trainInTorch():
 
     print('Finished!')
 
-    fig, ax = plt.subplots()
-    ax.plot(x.numpy(), y_pred.detach().numpy(), label='y_pred', color='magenta', linestyle='-', linewidth=2)
-    ax.plot(x.numpy(), y.numpy(), label='y', color='blue', linestyle='--', linewidth=2)
-    ax.legend()
-    plt.show()
+    plotResults(x.numpy(), y.numpy(), y_pred.detach().numpy())
+
 
 def trainInTorchWithNN():
     # Create Tensors to hold input and outputs.
     x = torch.linspace(-math.pi, math.pi, 2000)
     y = torch.sin(x)
 
-    # For this example, the output y is a linear function of (x, x^2, x^3), so
-    # we can consider it as a linear layer neural network. Let's prepare the
-    # tensor (x, x^2, x^3).
-    p = torch.tensor([1, 2, 3])
-    xx = x.unsqueeze(-1).pow(p)
+    # =======  Model  =======
+    # model = Polynomial3()
+    model = PolynomialNN(3)
+    # model = DynamicNet()
 
-    # In the above code, x.unsqueeze(-1) has shape (2000, 1), and p has shape
-    # (3,), for this case, broadcasting semantics will apply to obtain a tensor
-    # of shape (2000, 3)
+    # =======  Loss function  =======
+    # loss_fn = torch.nn.MSELoss(reduction='sum')
+    # loss_fn = lambda y_pred, y: (y_pred - y).pow(2).sum()
+    loss_fn = MyMSELoss(reduction='sum')
 
-    # Use the nn package to define our model as a sequence of layers. nn.Sequential
-    # is a Module which contains other Modules, and applies them in sequence to
-    # produce its output. The Linear Module computes output from input using a
-    # linear function, and holds internal Tensors for its weight and bias.
-    # The Flatten layer flatens the output of the linear layer to a 1D tensor,
-    # to match the shape of `y`.
-    model = torch.nn.Sequential(
-        torch.nn.Linear(3, 1),
-        torch.nn.Flatten(0, 1) # (first dim to flatten, last dim to flatten)
-    )
+    # =======  Optimizer  =======
+    # optimizer = MyOptimizer(model.parameters(), learning_rate=1e-6)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=1e-7, momentum=0.8)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.RMSprop(model.parameters(), lr=1e-3)
 
-    # The nn package also contains definitions of popular loss functions; in this
-    # case we will use Mean Squared Error (MSE) as our loss function.
-    loss_fn = torch.nn.MSELoss(reduction='sum')
+    prev_loss = math.inf
+    for t in range(14000):
 
-    learning_rate = 1e-6
-    for t in range(2000):
+        # Forward pass: compute predicted y by passing x to the model.
+        y_pred = model(x)
 
-        # Forward pass: compute predicted y by passing x to the model. Module objects
-        # override the __call__ operator so you can call them like functions. When
-        # doing so you pass a Tensor of input data to the Module and it produces
-        # a Tensor of output data.
-        y_pred = model(xx)
-
-        # Compute and print loss. We pass Tensors containing the predicted and true
-        # values of y, and the loss function returns a Tensor containing the
-        # loss.
+        # Compute loss.
         loss = loss_fn(y_pred, y)
+
+        if math.fabs(prev_loss - loss.item()) < 1e-3:
+            break
+        prev_loss = loss.item()
+
         if t % 100 == 99:
-            print('%4d: loss = %6.2f' % (t+1, loss.item()))
+            print('%4d: loss = %6.2f' % (t + 1, loss.item()))
 
         # Zero the gradients before running the backward pass.
-        model.zero_grad()
+        # model.zero_grad()
+        optimizer.zero_grad()
 
         # Backward pass: compute gradient of the loss with respect to all the learnable
         # parameters of the model. Internally, the parameters of each Module are stored
@@ -136,79 +237,20 @@ def trainInTorchWithNN():
         # all learnable parameters in the model.
         loss.backward()
 
-        # Update the weights using gradient descent. Each parameter is a Tensor, so
-        # we can access its gradients like we did before.
-        with torch.no_grad():
-            for param in model.parameters():
-                param -= learning_rate * param.grad
-
-    # You can access the first layer of `model` like accessing the first item of a list
-    linear_layer = model[0]
-
-    # For linear layer, its parameters are stored as `weight` and `bias`.
-    print('Result: y = %.1f + %.1f x + %.1f x^2 + %.1f x^3' % (linear_layer.bias.item(),
-           linear_layer.weight[:, 0].item(), linear_layer.weight[:, 1].item(), linear_layer.weight[:, 2].item()))
-
-
-def trainInTorchWithNNandOptim():
-    # Create Tensors to hold input and outputs.
-    x = torch.linspace(-math.pi, math.pi, 2000)
-    y = torch.sin(x)
-
-    # Prepare the input tensor (x, x^2, x^3).
-    p = torch.tensor([1, 2, 3])
-    xx = x.unsqueeze(-1).pow(p)
-
-    # Use the nn package to define our model and loss function.
-    model = torch.nn.Sequential(
-        torch.nn.Linear(3, 1),
-        torch.nn.Flatten(0, 1)
-    )
-    loss_fn = torch.nn.MSELoss(reduction='sum')
-
-    # Use the optim package to define an Optimizer that will update the weights of
-    # the model for us. Here we will use RMSprop; the optim package contains many other
-    # optimization algorithms. The first argument to the RMSprop constructor tells the
-    # optimizer which Tensors it should update.
-    learning_rate = 1e-3
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
-    for t in range(2000):
-        # Forward pass: compute predicted y by passing x to the model.
-        y_pred = model(xx)
-
-        # Compute and print loss.
-        loss = loss_fn(y_pred, y)
-        if t % 100 == 99:
-            print('%4d: loss = %6.2f' % (t+1, loss.item()))
-
-        # Before the backward pass, use the optimizer object to zero all of the
-        # gradients for the variables it will update (which are the learnable
-        # weights of the model). This is because by default, gradients are
-        # accumulated in buffers( i.e, not overwritten) whenever .backward()
-        # is called. Checkout docs of torch.autograd.backward for more details.
-        optimizer.zero_grad()
-
-        # Backward pass: compute gradient of the loss with respect to model
-        # parameters
-        loss.backward()
-
-        # Calling the step function on an Optimizer makes an update to its
-        # parameters
+        # Update the weights
         optimizer.step()
 
-    # You can access the first layer of `model` like accessing the first item of a list
-    linear_layer = model[0]
     # For linear layer, its parameters are stored as `weight` and `bias`.
-    print('Result: y = %.1f + %.1f x + %.1f x^2 + %.1f x^3' % (linear_layer.bias.item(),
-           linear_layer.weight[:, 0].item(), linear_layer.weight[:, 1].item(), linear_layer.weight[:, 2].item()))
+    print('Result:', model.string())
+
+    plotResults(x.numpy(), y.numpy(), y_pred.detach().numpy())
 
 
 if __name__ == '__main__':
-
     # trainInNumpy()
 
     # trainInTorch()
 
-    # trainInTorchWithNN()
+    trainInTorchWithNN()
 
-    trainInTorchWithNNandOptim()
+    # trainInTorchWithNNandOptim()

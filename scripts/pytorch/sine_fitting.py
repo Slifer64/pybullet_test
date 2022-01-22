@@ -47,21 +47,41 @@ class MyOptimizer:
                 param -= self.lr * param.grad
 
 
-class Polynomial3(torch.nn.Module):
+class Polynomial:  # (torch.nn.Module):
+    # if we inherit from nn.Module, then:
+    # - we don't need to implement __call__() and parameters()
+    # - we have to define the self.coeff as nn.Parameter, so that it gets registered in the nn.Modules parameters
+    # forward() is redundant if we don't inherit from nn.Module
 
-    def __init__(self):
+    def __init__(self, n):
         super().__init__()
-        self.a = torch.nn.Parameter(torch.randn(()))  # requires_grad=True by default
-        self.b = torch.nn.Parameter(torch.randn(()))
-        self.c = torch.nn.Parameter(torch.randn(()))
-        self.d = torch.nn.Parameter(torch.randn(()))
+        self.n = n
+        # self.coeff = torch.nn.Parameter(torch.randn((1, self.n + 1)))
+        self.coeff = torch.randn((1, self.n + 1), requires_grad=True)
 
     def forward(self, x):
-        return self.a + self.b * x + self.c * x**2 + self.d * x**3
+        y = self.coeff[:, 0] * torch.ones_like(x)
+        xi = torch.ones_like(x)
+        for i in range(1, self.n+1):
+            xi = xi * x
+            y = y + self.coeff[:, i]*xi
+        return y
+
+    def __call__(self, x):
+        return self.forward(x)
+
+    def parameters(self):
+        yield self.coeff  # we only have one nn.Parameter
 
     def string(self):
-        return 'y = {0:.1f} + {1:.1f}x + {2:.1f}x^2 + {3:.1f}x^3'.\
-            format(self.a.item(), self.b.item(), self.c.item(), self.d.item())
+        coeff = [self.coeff[:, i].item() for i in range(self.n+1)]
+        y_str = '{0:.1f}'.format(coeff[0])
+        if self.n > 0:
+            y_str += ' + {0:.1f}x'.format(coeff[1])
+        for i in range(2, self.n+1):
+            y_str += ' + {0:.1f}x^{1:d}'.format(coeff[i], i)
+
+        return y_str
 
 
 class PolynomialNN(torch.nn.Module):
@@ -85,14 +105,12 @@ class PolynomialNN(torch.nn.Module):
 
     def string(self):
         linear_layer = self.net[0]
-        a0 = linear_layer.bias.item()
-        coeff = [linear_layer.weight[:, i].item() for i in range(self.n)]
-
-        y_str = '{0:.1f}'.format(a0)
+        coeff = [linear_layer.bias.item()] + [linear_layer.weight[:, i].item() for i in range(self.n)]
+        y_str = '{0:.1f}'.format(coeff[0])
         if self.n > 0:
-            y_str += ' + {0:.1f}x'.format(coeff[0])
-        for i in range(1, self.n):
-            y_str += ' + {0:.1f}x^{1:d}'.format(coeff[i], i+1)
+            y_str += ' + {0:.1f}x'.format(coeff[1])
+        for i in range(2, self.n+1):
+            y_str += ' + {0:.1f}x^{1:d}'.format(coeff[i], i)
 
         return y_str
 
@@ -196,8 +214,8 @@ def trainInTorchWithNN():
     y = torch.sin(x)
 
     # =======  Model  =======
-    # model = Polynomial3()
-    model = PolynomialNN(3)
+    model = Polynomial(3)
+    # model = PolynomialNN(3)
     # model = DynamicNet()
 
     # =======  Loss function  =======
@@ -220,7 +238,7 @@ def trainInTorchWithNN():
         # Compute loss.
         loss = loss_fn(y_pred, y)
 
-        if math.fabs(prev_loss - loss.item()) < 1e-3:
+        if math.fabs(prev_loss - loss.item()) < 1e-4:
             break
         prev_loss = loss.item()
 

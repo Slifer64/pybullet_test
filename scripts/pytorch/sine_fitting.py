@@ -99,7 +99,11 @@ class PolynomialNN(torch.nn.Module):
         )
 
     def forward(self, x):
-        # the output y is a linear function of (x, x^2, x^3), so we can consider it as a linear layer neural network.
+        # x is vector                                  x.size() = (m,)
+        # Add dim 1 at the end: x1 = x.unsqueeze(-1),  x1.size() = (m, 1)
+        # p = torch.arange(1, n+1) ,                   p.size() = (n,)
+        # Now x1 and p are broacastible!
+        # So we can compute: x1.pow(p) = x1.pow(p.unsqueeze(0)) --> (m, 1) * (1, n) --> (m, n)
         xx = x.unsqueeze(-1).pow(torch.arange(start=1, end=self.n+1, step=1))
         return self.net(xx)
 

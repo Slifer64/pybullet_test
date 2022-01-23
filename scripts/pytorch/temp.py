@@ -4,31 +4,18 @@ import torch
 import matplotlib.pyplot as plt
 
 
-def dummy_fun(x):
-     y = 0
-     xi = x.clone()
-     for i in range(len(x)):
-         y += xi
-         xi *= xi
-
-     return y
-
 if __name__ == '__main__':
-
-    # trainInTorch()
 
     torch.random.manual_seed(0)
 
-    a0 = torch.nn.Parameter(torch.tensor([0.]))
-    param = torch.nn.Parameter(torch.tensor([3., 2., 1.]))
+    n_out = 10
+    y = torch.randn(n_out)
 
-    print(param.size())
+    f_y = y - torch.log(torch.sum(torch.exp(y))) * torch.ones_like(y)
 
-    # x = torch.linspace(0, 2, 10)
-    #
-    # y = a0
-    # for i in range()
-    #
-    # print(param)
-    # print(param[:, 1])
-    # print(param.data[:, 1])
+    f_y2 = y - y.exp().sum().log() * torch.ones_like(y)
+
+    print(f_y)
+    print(f_y2)
+
+    torch.nn.CrossEntropyLoss

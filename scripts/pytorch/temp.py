@@ -3,19 +3,20 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
+def loss_fun(x, y):
+
+    return x.sum().item(), y.item()
 
 if __name__ == '__main__':
 
     torch.random.manual_seed(0)
 
-    n_out = 10
-    y = torch.randn(n_out)
+    x_data = torch.randn((5, 20))
+    y_data = torch.randn(5)
 
-    f_y = y - torch.log(torch.sum(torch.exp(y))) * torch.ones_like(y)
+    data_set = torch.utils.data.TensorDataset(x_data, y_data)
 
-    f_y2 = y - y.exp().sum().log() * torch.ones_like(y)
+    a = [loss_fun(x, y) for x, y in data_set]
 
-    print(f_y)
-    print(f_y2)
+    print(*a)
 
-    torch.nn.CrossEntropyLoss

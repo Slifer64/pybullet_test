@@ -12,6 +12,10 @@ import numpy as np
 
 import time
 
+
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+
 def display_digit(digit_vec: torch.Tensor):
 
     plt.imshow(digit_vec.numpy().reshape((28, 28)), cmap="gray")
@@ -139,27 +143,34 @@ class Mnist_CNN(torch.nn.Module):
 
     def __init__(self):
         super().__init__()
+        input_tf = Transform_layer(lambda x: x.view(-1, 1, 28, 28))  # batch_size -1 to assign it automatically
+        conv1 = torch.nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1)
+        conv2 = torch.nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
+        pool = torch.nn.AvgPool2d(2)
+        flatten = Transform_layer(lambda x: x.view(x.size(0), -1))
+
+        # create dummy input to calculate output dim so far:
+        with torch.no_grad():
+            x = torch.randn(28**2)
+            x = input_tf(x)
+            x = F.relu(conv1(x))
+            x = F.relu(conv2(x))
+            x = pool(x)
+            x = flatten(x)  # torch.flatten(x, 1)  # don't flatten batch_size (0)
+            n_conv_out = x.numel()
+
+        out_layer = torch.nn.Linear(n_conv_out, 10)
+
         self.net = torch.nn.Sequential(
-            Transform_layer(lambda x: x.view(-1, 1, 28, 28)),
-            torch.nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(16, 16, kernel_size=3, stride=2, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(16, 10, kernel_size=3, stride=2, padding=1),  # out 10 channels, one for each class
-            torch.nn.ReLU(),
-            torch.nn.AvgPool2d(4),
-            # Transform_layer(lambda x: x.view(x.size(0), -1))
-            Transform_layer(lambda x: torch.flatten(x)),
-            # torch.nn.Flatten(1),
-            torch.nn.Linear(640, 10)
+            input_tf,
+            conv1, torch.nn.ReLU(),
+            conv2, torch.nn.ReLU(),
+            pool, flatten,  #torch.nn.Flatten(1),  # don't flatten batch_size (0)
+            out_layer
         )
 
     def forward(self, x: torch.Tensor):
-        # y = torch.flatten(self.net(x))
-        # y = self.net(x)
-        # print(y.size())
-        # raise Exception()
-        return self.net(x)
+        return self.net(x.to(device))
 
 
 def calc_accuracy(model, data_loader: MyDataLoader):
@@ -180,7 +191,7 @@ def calc_accuracy(model, data_loader: MyDataLoader):
             cb_hat = torch.argmax(y_pred, dim=1)
 
             total += cb.numel()
-            correct += (cb == cb_hat).sum().item()
+            correct += (cb.to(device) == cb_hat).sum().item()
 
     return 100.*correct/total
 
@@ -201,7 +212,7 @@ def trainModel(train_loader, model, loss_fun, optimizer, valid_loader=None):
 
             y_pred = model(xb)
 
-            loss = loss_fun(y_pred, cb)
+            loss = loss_fun(y_pred.to(device), cb.to(device))
 
             optimizer.zero_grad()
 
@@ -214,14 +225,12 @@ def trainModel(train_loader, model, loss_fun, optimizer, valid_loader=None):
 
         if valid_loader is not None:
             with torch.no_grad():
-                valid_loss = sum(loss_fun(model(xb), yb).item() for xb, yb in valid_loader) / len(valid_loader)
+                valid_loss = sum(loss_fun(model(xb), yb.to(device)).item() for xb, yb in valid_loader) / len(valid_loader)
             print('epoch %d: validation loss = %.3f' % (epoch+1, valid_loss))
 
 
 
 if __name__ == '__main__':
-
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     torch.random.manual_seed(0)
 
@@ -246,9 +255,10 @@ if __name__ == '__main__':
     # model = Mnist_net()
     # model = Mnist_model()
     model = Mnist_CNN()
+    model.to(device)
     # loss_fun = torch.nn.CrossEntropyLoss(reduction='mean')
     loss_fun = torch.nn.functional.cross_entropy
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
     trainModel(train_loader, model, loss_fun, optimizer, valid_loader=valid_loader)
 
     # train_loader.setBatchSize(200)

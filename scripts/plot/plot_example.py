@@ -20,6 +20,10 @@ if __name__ == '__main__':
 
     np.random.seed(0)
 
+    # execution doesn't halt at plt.show()
+    plt.ion()
+    # plt.ioff()
+
     x = np.linspace(-np.pi, np.pi, 1000)
     y_sin = np.sin(x)
     y_cos = np.cos(x)

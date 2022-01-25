@@ -53,12 +53,21 @@ class DQN(nn.Module):
         self.bn3 = nn.BatchNorm2d(32)
 
         # Number of Linear input connections depends on output of conv2d layers
-        # and therefore the input image size, so compute it.
-        def conv2d_size_out(size, kernel_size = 5, stride = 2):
-            return (size - (kernel_size - 1) - 1) // stride  + 1
-        convw = conv2d_size_out(conv2d_size_out(conv2d_size_out(w)))
-        convh = conv2d_size_out(conv2d_size_out(conv2d_size_out(h)))
-        linear_input_size = convw * convh * 32
+        # and therefore the input image size, so compute it:
+
+        # def conv2d_size_out(size, kernel_size = 5, stride = 2):
+        #     return (size - (kernel_size - 1) - 1) // stride  + 1
+        # convw = conv2d_size_out(conv2d_size_out(conv2d_size_out(w)))
+        # convh = conv2d_size_out(conv2d_size_out(conv2d_size_out(h)))
+        # linear_input_size = convw * convh * 32
+
+        with torch.no_grad():
+            x = torch.zeros((1, 3, h, w))
+            x = F.relu(self.bn1(self.conv1(x)))
+            x = F.relu(self.bn2(self.conv2(x)))
+            x = F.relu(self.bn3(self.conv3(x)))
+            linear_input_size = x.numel()  # x.view(-1).size(0) , x.flatten(0).size(0)
+
         self.head = nn.Linear(linear_input_size, outputs)
 
     # Called with either one element to determine next action, or a batch
@@ -68,7 +77,9 @@ class DQN(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        return self.head(x.view(x.size(0), -1))
+        # self.head(x.view(x.size(0), -1))
+        # self.head(x.view(-1, x.size(1)*x.size(2)*x.size(3)))
+        return self.head(torch.flatten(x, 1))
 
 
 def get_cart_location(screen_width):
@@ -116,8 +127,7 @@ if __name__ == '__main__':
 
     env.reset()
     plt.figure()
-    plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
-               interpolation='none')
+    plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(), interpolation='none')
     plt.title('Example extracted screen')
     plt.show()
 
@@ -140,7 +150,7 @@ if __name__ == '__main__':
     policy_net = DQN(screen_height, screen_width, n_actions).to(device)
     target_net = DQN(screen_height, screen_width, n_actions).to(device)
     target_net.load_state_dict(policy_net.state_dict())
-    target_net.eval()
+    target_net.eval() # to avoid calling torch.no_grad() whenever we apply computations with target_net
 
     optimizer = optim.RMSprop(policy_net.parameters())
     memory = ReplayMemory(10000)
@@ -149,19 +159,24 @@ if __name__ == '__main__':
 
 
     def select_action(state):
+        """
+        \brief Chooses an action according to epsilon-greedy policy.
+        @param[in] state: tensor of size (1, C, H, W)
+        @return: tensor of size (1, 1) containing a integer in [0...n_actions)
+        """
         global steps_done
-        sample = random.random()
-        eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-                        math.exp(-1. * steps_done / EPS_DECAY)
+        eps_threshold = EPS_END + (EPS_START - EPS_END) * math.exp(-1. * steps_done / EPS_DECAY)
         steps_done += 1
-        if sample > eps_threshold:
+        if random.random() > eps_threshold:
             with torch.no_grad():
                 # t.max(1) will return largest column value of each row.
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
-                return policy_net(state).max(1)[1].view(1, 1)
+                # return policy_net(state).max(1)[1].view(1, 1)
+                return policy_net(state).max(1)[1].item()
         else:
-            return torch.tensor([[random.randrange(n_actions)]], device=device, dtype=torch.long)
+            # return torch.tensor([[random.randrange(n_actions)]], device=device, dtype=torch.long)
+            return random.randrange(n_actions)
 
 
     episode_durations = []
@@ -191,25 +206,40 @@ if __name__ == '__main__':
         if len(memory) < BATCH_SIZE:
             return
         transitions = memory.sample(BATCH_SIZE)
-        # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-        # detailed explanation). This converts batch-array of Transitions
-        # to Transition of batch-arrays.
+        # ==> transitions:
+        # [Transition(state1, action1, next_state1, reward1), Transition(state2, action2, next_state2, reward2), ...]
+        # ==> *transitions:
+        # Transition(state1, action1, next_state1, reward1), Transition(state2, action2, next_state2, reward2), ...
+        # ==> zip(*transitions):
+        # ((state1, state2, ...), (action1, action2, ...), (next_state1, next_state2, ...), (reward1, reward2, ...))
+        # ==> *zip(*transitions):
+        # (state1, state2, ...), (action1, action2, ...), (next_state1, next_state2, ...), (reward1, reward2, ...)
+        # ==> Transition(*zip(*transitions)):
+        # Transition with
+        #     state: (state1, state2, ...)
+        #     action: (action1, action2, ...)
+        #     next_state: (next_state1, next_state2, ...)
+        #     reward: (reward1, reward2, ...)
         batch = Transition(*zip(*transitions))
 
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                                batch.next_state)), device=device, dtype=torch.bool)
-        non_final_next_states = torch.cat([s for s in batch.next_state
-                                           if s is not None])
+        # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
+        #                               device=device, dtype=torch.bool)
+        # non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+
+        nonfinal_ind = [i for i, s in enumerate(batch.next_state) if s is not None]
+        non_final_next_states = torch.cat(tuple(batch.next_state[i] for i in nonfinal_ind))
+
         state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
-        reward_batch = torch.cat(batch.reward)
+        action_batch = torch.as_tensor(batch.action, device=device, dtype=torch.long)
+        reward_batch = torch.as_tensor(batch.reward, device=device)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
-        state_action_values = policy_net(state_batch).gather(1, action_batch)
+        # state_action_values = policy_net(state_batch).gather(1, action_batch)
+        state_action_values = policy_net(state_batch).gather(1, action_batch.view(-1, 1)).view(-1)
 
         # Compute V(s_{t+1}) for all next states.
         # Expected values of actions for non_final_next_states are computed based
@@ -217,13 +247,14 @@ if __name__ == '__main__':
         # This is merged based on the mask, such that we'll have either the expected
         # state value or 0 in case the state was final.
         next_state_values = torch.zeros(BATCH_SIZE, device=device)
-        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
+        # next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
+        next_state_values[nonfinal_ind] = target_net(non_final_next_states).max(1)[0].detach()  # !!!!!!!!!!!!!
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 
         # Compute Huber loss
         criterion = nn.SmoothL1Loss()
-        loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+        loss = criterion(state_action_values, expected_state_action_values)
 
         # Optimize the model
         optimizer.zero_grad()
@@ -233,7 +264,7 @@ if __name__ == '__main__':
         optimizer.step()
 
 
-    num_episodes = 50
+    num_episodes = 200
     for i_episode in range(num_episodes):
         # Initialize the environment and state
         env.reset()
@@ -243,8 +274,7 @@ if __name__ == '__main__':
         for t in count():
             # Select and perform an action
             action = select_action(state)
-            _, reward, done, _ = env.step(action.item())
-            reward = torch.tensor([reward], device=device)
+            _, reward, done, _ = env.step(action)
 
             # Observe new state
             last_screen = current_screen

@@ -1,17 +1,10 @@
-import math
+import torch
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
-
-
 
 if __name__ == '__main__':
 
-    torch.random.manual_seed(0)
+    a = torch.tensor(tuple(i**2 for i in range(10)))
 
-    x = torch.randn((3, 1, 2, 2))
 
-    print(x)
-
-    print(torch.flatten(x, 1))
-
+    print(a[[1, 3, 5]])

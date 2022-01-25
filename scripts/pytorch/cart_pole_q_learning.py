@@ -104,6 +104,7 @@ def get_screen():
     else:
         slice_range = slice(cart_location - view_width // 2,
                             cart_location + view_width // 2)
+
     # Strip off the edges, so that we have a square image centered on a cart
     screen = screen[:, :, slice_range]
     # Convert to float, rescale, convert to torch tensor
@@ -124,12 +125,15 @@ if __name__ == '__main__':
         from IPython import display
 
     plt.ion()
+    plt.ioff()
 
     env.reset()
     plt.figure()
     plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(), interpolation='none')
     plt.title('Example extracted screen')
     plt.show()
+
+    raise Exception()
 
     BATCH_SIZE = 128
     GAMMA = 0.999

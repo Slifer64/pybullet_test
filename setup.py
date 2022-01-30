@@ -19,6 +19,7 @@ setup(name='pybullet_test',
                         'torch', \
                         'torchvision == 0.5.0', \
                         'tensorflow', \
-                        'gym'
+                        'gym', \
+                        'tqdm'
       ]
 )

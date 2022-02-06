@@ -5,3 +5,9 @@ robot:
             'ur5_wrist_3_joint']
   ee_link: "tool_link"
   urdf: "../assets/ur5e.urdf"
+  joint_limits: 
+    lower: [-6.28, -6.28, -3.14, -6.28, -6.28, -6.28]
+    upper: [ 6.28,  6.28,  3.14,  6.28,  6.28,  6.28]
+  base:
+    pos: [0, 0, 0]
+    quat: [1, 0, 0, 0]

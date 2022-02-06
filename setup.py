@@ -5,20 +5,20 @@ setup(name='pybullet_test',
       version='0.1',
       author='Antonis Sidiropoulos',
       author_email='antosidi@ece.auth.gr',
-      install_requires=['numpy==1.18', \
+      install_requires=['numpy==1.19.5', \
                         'sphinx', \
                         # 'sphinxcontrib-bibtex==2.1.4', \
                         # 'sphinx_rtd_theme==0.5.1', \
                         'numpydoc==1.1.0', \
                         'pybullet==3.2.1', \
                         'opencv-python', \
-                        'matplotlib==3.0.3', \
+                        'matplotlib==3.3.3', \
                         'scipy', \
-                        'open3d==0.8.0', \
+                        'open3d==0.12.0', \
                         'PyYAML', \
-                        'torch', \
-                        'torchvision == 0.5.0', \
-                        'tensorflow', \
+                        # 'torch', \
+                        # 'torchvision == 0.5.0', \
+                        # 'tensorflow', \
                         'gym', \
                         'tqdm'
       ]

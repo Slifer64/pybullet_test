@@ -8,6 +8,45 @@ import pybullet as p
 import pybullet_data
 import time
 import enum
+import inspect
+
+
+# =====================================
+# ============ GUI utils ==============
+# =====================================
+
+class Button:
+    def __init__(self, title):
+        self.id = p.addUserDebugParameter(title, 1, 0, 1)
+        self.counter = p.readUserDebugParameter(self.id)
+        self.counter_prev = self.counter
+
+    def on(self):
+        self.counter = p.readUserDebugParameter(self.id)
+        if self.counter % 2 == 0:
+            return True
+        return False
+
+
+class Gui:
+    def __init__(self):
+        self.pause_id = p.addUserDebugParameter("Pause", 1, 0, 1)
+        self.counter = p.readUserDebugParameter(self.pause_id)
+        self.counter_prev = self.counter
+
+
+        self.id_2 = p.addUserDebugParameter("simulationSpeed", 0, 0.02, 0)
+
+        self.exit_button = Button('Exit')
+
+    def paused(self):
+        self.counter = p.readUserDebugParameter(self.pause_id)
+        if self.counter % 2 == 0:
+            return True
+        return False
+
+    def speed(self):
+        self.wait = p.readUserDebugParameter(self.id_2)
 
 
 # =============================================
@@ -54,9 +93,11 @@ class Robot:
     # --------------------------------
 
     # ============= Constructor ===============
-    def __init__(self, urdf_filename, joint_names, ee_link):
+    def __init__(self, urdf_filename, joint_names, ee_link, 
+            joint_lower_limits=None, joint_upper_limits=None,
+            base_pos=[0, 0, 0], base_quat=[1, 0, 0, 0]):
 
-        self.__robot_id = p.loadURDF(urdf_filename)  # , pos, quat)
+        self.__robot_id = p.loadURDF(urdf_filename, basePosition=base_pos, baseOrientation=[*base_quat[1:], base_quat[0]])
 
         self.__joint_names = joint_names.copy()
         self.__ee_link = ee_link
@@ -64,6 +105,9 @@ class Robot:
 
         self.__joint_id = [None] * self.__N_JOINTS
         self.__ee_id = None
+
+        self.__joints_lower_lim = joint_lower_limits.copy()
+        self.__joints_upper_lim = joint_upper_limits.copy()
 
         joints_info = [p.getJointInfo(self.__robot_id, i) for i in range(p.getNumJoints(self.__robot_id))]
         for i in range(self.__N_JOINTS):
@@ -105,14 +149,15 @@ class Robot:
                                         targetPositions=self.__joints_pos_cmd)
         elif self.__ctrl_mode is CtrlMode.JOINT_VELOCITY:
             p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.VELOCITY_CONTROL,
-                                        targetVelocity=self.__joints_vel_cmd)
+                                        targetVelocities=self.__joints_vel_cmd)
         elif self.__ctrl_mode is CtrlMode.JOINT_TORQUE:
             raise RuntimeError("Not implemented yet...")
         elif self.__ctrl_mode is CtrlMode.CART_POSITION:
-            raise RuntimeError("Not implemented yet...")
+            p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.POSITION_CONTROL,
+                                        targetPositions=self.__joints_pos_cmd)
         elif self.__ctrl_mode is CtrlMode.CART_VELOCITY:
             jvel_cmd = np.matmul( linalg.pinv(self.getEEJacobian()), self.__cart_vel_cmd)
-            p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.VELOCITY_CONTROL, targetVelocity=jvel_cmd)
+            p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.VELOCITY_CONTROL, targetVelocities=jvel_cmd)
         else: # CtrlMode.IDLE
             pass
 
@@ -131,13 +176,19 @@ class Robot:
 
         self.__ctrl_mode = ctrl_mode
 
+    def getCtrlMode(self):
+        return self.__ctrl_mode
+
     # =======================================
-    def reset(self, j_pos):
+    def resetJoints(self, j_pos):
 
         for id, pos in zip(self.__joint_id, j_pos):
             p.resetJointState(self.__robot_id, id, pos)
 
         self.__readState()
+
+    def resetPose(self, pos, quat):
+        pass
 
     # =======================================
     def getNumJoints(self):
@@ -145,26 +196,29 @@ class Robot:
         return self.__N_JOINTS
 
     # =======================================
-    def setJointsPosition(self, j_pos_cmd):
+    def setJointsPosition(self, jpos_cmd):
 
         if self.__ctrl_mode is not CtrlMode.JOINT_POSITION:
             raise RuntimeError("The control mode must be 'JOINT_POSITION' to set joint positions!")
 
-        self.__joints_pos_cmd = j_pos_cmd.copy()
+        self.__joints_pos_cmd = jpos_cmd.copy()
 
-    def setJointsVelocity(self, j_pos_cmd):
+    def setJointsVelocity(self, jvel_cmd):
 
         if self.__ctrl_mode is not CtrlMode.JOINT_VELOCITY:
             raise RuntimeError("The control mode must be 'JOINT_VELOCITY' to set joint velocities!")
 
-        self.__joints_pos_cmd = j_pos_cmd.copy()
+        self.__joints_vel_cmd = jvel_cmd.copy()
 
     def setCartPose(self, pos_cmd, quat_cmd):
 
         if self.__ctrl_mode is not CtrlMode.CART_POSITION:
             raise RuntimeError("The control mode must be 'CART_POSITION' to set cartesian pose!")
 
-        raise NotImplemented
+        quat_xyzw = [quat_cmd[1:], quat_cmd[0]]
+        jpos_cmd = p.calculateInverseKinematics(bodyIndex=self.__robot_id, endEffectorLinkIndex=self.__ee_id,
+                                              targetPosition=pos_cmd, targetOrientation=quat_xyzw)
+        self.setJointsPosition(jpos_cmd)
 
     def setCartVelocity(self, vel_cmd):
 
@@ -176,11 +230,11 @@ class Robot:
     # =====================================
     def getJointsPosition(self):
 
-        return self.__joints_pos
+        return self.__joints_pos.copy()
 
     def getJointsVelocity(self):
 
-        return self.__joints_vel
+        return self.__joints_vel.copy()
 
     def getTaskPosition(self):
 
@@ -215,10 +269,13 @@ class Robot:
 
         return jacob
 
-    # =======================================
-    def str(self):
+    def getJointsLowerLimit(self):
+        return self.__joints_lower_lim.copy()
 
-        return self.__str__()
+    def getJointsUpperLimit(self):
+        return self.__joints_upper_lim.copy()
+
+    # =======================================
 
     # ---------------------------------
     # -----------  Private  -----------
@@ -268,84 +325,88 @@ def get5thOrderTraj(t: float, p0: np.array, pf: np.array, total_time: float) -> 
 # =============  MAIN ================
 # ====================================
 
-if __name__ == '__main__':
 
-    print("========= Robot joints trajectory example =========")
-
-    with open('../yaml/params.yml', 'r') as stream:
-        params = yaml.safe_load(stream)
-
-    Ts = 0.004
-    env = VirtualEnv()
-    env.setTimeStep(Ts)
-
-    robot_parmas = params["robot"]
-    robot = Robot(robot_parmas["urdf"], robot_parmas["joints"], robot_parmas["ee_link"])
-    print(robot)
-
+def jointSpaceControl(env, robot, Ts, ctrl_mode="position"):
+    
     t = 0.
     n_joints = robot.getNumJoints()
 
-    np.random.seed(0)
-
-    joint_limits = np.array([6.28, 6.28, 3.14, 6.28, 6.28, 6.28])
-    j_init = np.multiply(2 * np.random.rand(n_joints) - 1, joint_limits)
-    j_final = np.multiply(2 * np.random.rand(n_joints) - 1, joint_limits)
+    j_init = np.array([-1.6, -1.73, -2.2, -0.808, 1.6, -0.031])
+    j_final = np.array([-0.1, -1.8, -0.8, -0.1, 0.5, -1])
 
     T = max(linalg.norm(j_init[0:n_joints] - j_final[0:n_joints], np.inf) * 4.0 / np.pi, 2.0)
 
-    robot.reset(j_init)
+    robot.resetJoints(j_init)
     robot.update()
-
-    p0 = robot.getTaskPosition()
-    p_target = p0 + np.array([0.15, 0.2, 0.3])
 
     Time = np.array([t])
     jpos_data = robot.getJointsPosition()
-    pos_data = p0
-    jd_pos_data = j_init
+    jvel_data = np.zeros_like(j_init)
+    pos_data = robot.getTaskPosition()
 
-    # robot.setCtrlMode(CtrlMode.JOINT_POSITION)
-    robot.setCtrlMode(CtrlMode.JOINT_VELOCITY)
-    # robot.setCtrlMode(CtrlMode.CART_VELOCITY)
+    jpos_ref_data = j_init
+    jvel_ref_data = np.zeros_like(j_init)
+
+    if ctrl_mode == "position":
+        robot.setCtrlMode(CtrlMode.JOINT_POSITION)
+        setRobotReference = lambda jpos_ref, jvel_ref: robot.setJointsPosition(jpos_ref)
+    elif ctrl_mode == "velocity":
+        robot.setCtrlMode(CtrlMode.JOINT_VELOCITY)
+        setRobotReference = lambda jpos_ref, jvel_ref: robot.setJointsVelocity(jvel_ref)
+    else:
+        raise ValueError('Unsupported control mode "' + ctrl_mode + '"...')
 
     # simulation loop
     while t < T:
         env.step()
         robot.update()
 
-        jd_pos, jd_vel, _ = get5thOrderTraj(t, j_init, j_final, T)
-        # robot.setJointsPosition(jd_pos)
-        robot.setJointsPosition(jd_vel)
-
-        # _, vd, _ = get5thOrderTraj(t, p0, p_target, T)
-        # robot.setCartVelocity(vd)
+        jpos_ref, jvel_vel, _ = get5thOrderTraj(t, j_init, j_final, T)
+        setRobotReference(jpos_ref, jvel_vel)
 
         t += Ts
         Time = np.append(Time, t)
         jpos_data = np.column_stack((jpos_data, robot.getJointsPosition()))
+        jvel_data = np.column_stack((jvel_data, robot.getJointsVelocity()))
         pos_data = np.column_stack((pos_data, robot.getTaskPosition()))
-        jd_pos_data = np.column_stack((jd_pos_data, jd_pos))
+        jpos_ref_data = np.column_stack((jpos_ref_data, jpos_ref))
+        jvel_ref_data = np.column_stack((jvel_ref_data, jvel_vel))
+
+    # jvel_data = np.column_stack((np.diff(jpos_data, axis=1)/Ts, np.zeros_like(j_init)))
 
     # ========= Plot ===========
 
-    # Joint trajectories
+    # plt.ion()
+
+    # Joint Position trajectories
     fig, axs = plt.subplots(n_joints, 1)
     for i, ax in enumerate(axs):
         ax.plot(Time, jpos_data[i, :], linewidth=2, color='blue', label='robot')
-        ax.plot(Time, jd_pos_data[i, :], linewidth=2, linestyle='--', color='magenta', label='ref')
+        ax.plot(Time, jpos_ref_data[i, :], linewidth=2, linestyle='--', color='magenta', label='ref')
         ax.set_ylabel("j" + str(i))
         if i == 0:
             ax.legend(loc='upper left', fontsize=14)
-    axs[0].set_title("Robot joints trajectories")
+    axs[0].set_title("Joints Position")
+    axs[n_joints - 1].set_xlabel("time [s]", fontsize=14)
+
+    # Joint Velocity trajectories
+    fig, axs = plt.subplots(n_joints, 1)
+    for i, ax in enumerate(axs):
+        ax.plot(Time, jvel_data[i, :], linewidth=2, color='blue', label='robot')
+        ax.plot(Time, jvel_ref_data[i, :], linewidth=2, linestyle='--', color='magenta', label='ref')
+        ax.set_ylabel("j" + str(i))
+        if i == 0:
+            ax.legend(loc='upper left', fontsize=14)
+    axs[0].set_title("Joints Velocity")
     axs[n_joints - 1].set_xlabel("time [s]", fontsize=14)
 
     # Cartesian Position trajectories
     fig, axs = plt.subplots(3,1)
     y_labels = ["x", "y", "z"]
     for i in range(0,3):
-        ax.plot(Time, pos_data[i,:], linewidth=2, color='blue')
-        ax.set_ylabel(y_labels[i])
+        axs[i].plot(Time, pos_data[i,:], linewidth=2, color='blue')
+        axs[i].set_ylabel(y_labels[i])
+    axs[0].set_title("Cartesian position", fontsize=14)
     axs[2].set_xlabel("time [s]", fontsize=14)
 
     # Cartesian Position path
@@ -356,4 +417,79 @@ if __name__ == '__main__':
 
     plt.show()
 
-    dummy = input('Press enter to continue...')
+
+def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
+    
+    t = 0.
+    n_joints = robot.getNumJoints()
+
+    init_pose = np.array([-0.142, -0.436, 0.152, 0, 0, 0, 1])
+    final_pose = np.array([0.426, -0.31, 0.899, 0.77, 0.0964, 0.2931, -0.5584])
+
+    T = max(linalg.norm(init_pose[0:3] - final_pose[0:3]) * 4.0, 1.5)
+
+    robot.resetPose(init_pose[0:3], init_pose[3:])
+    robot.update()
+
+    Time = np.array([t])
+    pose_data = robot.getTaskPose()
+    vel_data = np.zeros_like(init_pose)
+
+    pose_ref_data = init_pose
+    vel_ref_data = np.zeros_like(init_pose)
+
+    if ctrl_mode == "position":
+        robot.setCtrlMode(CtrlMode.CART_POSITION)
+        setRobotReference = lambda pose_ref, vel_ref: robot.setCartPose(pose_ref)
+    elif ctrl_mode == "velocity":
+        robot.setCtrlMode(CtrlMode.CART_VELOCITY)
+        setRobotReference = lambda pose_ref, vel_ref: robot.setCartVelocity(vel_ref)
+    else:
+        raise ValueError('Unsupported control mode "' + ctrl_mode + '"...')
+
+    # simulation loop
+    while t < T:
+        env.step()
+        robot.update()
+
+        pose_ref, vel_rel, _ = get5thOrderTraj(t, init_pose, final_pose, T)
+        setRobotReference(pose_ref, vel_rel)
+
+        # Quaternion has to be normalized, or more correctly, use quatLog and quatExp
+
+        t += Ts
+        Time = np.append(Time, t)
+        pose_data = np.column_stack((pose_data, robot.getTaskPose()))
+        pose_ref_data = np.column_stack((pose_ref_data, pose_ref))
+        vel_ref_data = np.column_stack((vel_ref_data, vel_rel))
+
+    # ========= Plot ===========
+
+    # TODO
+
+    input('Press [enter] to continue...')
+
+
+if __name__ == '__main__':
+
+    print("========= Robot trajectory example =========")
+
+    with open('../yaml/params.yml', 'r') as stream:
+        params = yaml.safe_load(stream)
+
+    Ts = 0.004
+    env = VirtualEnv()
+    env.setTimeStep(Ts)
+
+    robot_parmas = params["robot"]
+    robot = Robot(robot_parmas["urdf"], robot_parmas["joints"], robot_parmas["ee_link"],
+                    joint_lower_limits=robot_parmas['joint_limits']['lower'],
+                    joint_upper_limits=robot_parmas['joint_limits']['upper'],
+                    base_pos=robot_parmas['base']['pos'],
+                    base_quat=robot_parmas['base']['quat'])
+    print(robot)
+
+    # jointSpaceControl(env, robot, Ts, ctrl_mode="position")
+    
+    CartSpaceControl(env, robot, Ts, ctrl_mode="velocity")
+

@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -9,7 +11,10 @@ import pybullet_data
 import time
 import enum
 import inspect
+import warnings
+import math
 
+from utils.orientation import Quaternion, quatExp, quatLog, qLogDot_to_rotVel
 
 # =====================================
 # ============ GUI utils ==============
@@ -48,6 +53,21 @@ class Gui:
     def speed(self):
         self.wait = p.readUserDebugParameter(self.id_2)
 
+def plotFrame(pos, quat, name=None, length=0.1, linewidth=3):
+
+    quat = Quaternion(*quat)
+    x_id = p.addUserDebugLine(pos, pos + length * quat.rotation_matrix()[:, 0], lineColorRGB=[1, 0, 0], lineWidth=linewidth)
+    y_id = p.addUserDebugLine(pos, pos + length * quat.rotation_matrix()[:, 1], lineColorRGB=[0, 1, 0], lineWidth=linewidth)
+    z_id = p.addUserDebugLine(pos, pos + length * quat.rotation_matrix()[:, 2], lineColorRGB=[0, 0, 1], lineWidth=linewidth)
+    if name is not None:
+        p.addUserDebugText(text=name, textPosition=pos)
+
+    return [x_id, y_id, z_id]
+
+def removeFrame(frame_id):
+
+    for id in frame_id:
+        p.removeUserDebugItem(id)
 
 # =============================================
 # ============ Virtual Env class ==============
@@ -78,6 +98,7 @@ class VirtualEnv:
 # ============ Robot class ==============
 # =======================================
 
+
 class CtrlMode(enum.Enum):
     IDLE = -1
     JOINT_POSITION = 1
@@ -86,7 +107,7 @@ class CtrlMode(enum.Enum):
     CART_POSITION = 4
     CART_VELOCITY = 5
 
-class Robot:
+class BulletRobot:
 
     # --------------------------------
     # -----------  Public  -----------
@@ -97,7 +118,10 @@ class Robot:
             joint_lower_limits=None, joint_upper_limits=None,
             base_pos=[0, 0, 0], base_quat=[1, 0, 0, 0]):
 
-        self.__robot_id = p.loadURDF(urdf_filename, basePosition=base_pos, baseOrientation=[*base_quat[1:], base_quat[0]])
+        self.__robot_id = p.loadURDF(urdf_filename,
+                                     basePosition=base_pos,
+                                     baseOrientation=[*base_quat[1:], base_quat[0]],
+                                     useFixedBase=True)
 
         self.__joint_names = joint_names.copy()
         self.__ee_link = ee_link
@@ -188,7 +212,37 @@ class Robot:
         self.__readState()
 
     def resetPose(self, pos, quat):
-        pass
+        _, found_solution = self.calculateInverseKinematics(pos, quat, threshold=1e-4, maxIter=100)
+        if not found_solution:
+            warnings.warn("Failed to find IK solution within defined error tolerance...")
+
+    def calculateInverseKinematics(self, targetPos, targetQuat, threshold=1e-5, maxIter=100):
+        found_solution = False
+        iter = 0
+        dist = float('inf')
+        targetQuat = [*targetQuat[1:], targetQuat[0]]
+        while (not found_solution and iter < maxIter):
+            iter = iter + 1
+            jointPoses = p.calculateInverseKinematics(self.__robot_id, self.__ee_id, targetPos, targetQuat,
+                                                      lowerLimits=self.getJointsLowerLimit(),
+                                                      upperLimits=self.getJointsUpperLimit())
+            jointPoses = [*jointPoses]
+            self.resetJoints(jointPoses)
+
+            ls = p.getLinkState(self.__robot_id, self.__ee_id, computeForwardKinematics=1)
+            newPos, newQuat = ls[4], ls[5]
+            pos_dist = math.sqrt(sum([(targetPos[i] - newPos[i]) ** 2 for i in range(3)]))
+
+            qdiff_w = sum([a*b for a, b in zip(targetQuat, newQuat)])
+            if qdiff_w < 0:
+                newQuat = [-a for a in newQuat]
+                qdiff_w = sum([a * b for a, b in zip(targetQuat, newQuat)])
+            quat_dist = 1 - qdiff_w
+
+            dist = pos_dist + quat_dist
+            found_solution = (dist < threshold)
+
+        return jointPoses, found_solution
 
     # =======================================
     def getNumJoints(self):
@@ -215,10 +269,8 @@ class Robot:
         if self.__ctrl_mode is not CtrlMode.CART_POSITION:
             raise RuntimeError("The control mode must be 'CART_POSITION' to set cartesian pose!")
 
-        quat_xyzw = [quat_cmd[1:], quat_cmd[0]]
-        jpos_cmd = p.calculateInverseKinematics(bodyIndex=self.__robot_id, endEffectorLinkIndex=self.__ee_id,
-                                              targetPosition=pos_cmd, targetOrientation=quat_xyzw)
-        self.setJointsPosition(jpos_cmd)
+        jpos_cmd, _ = self.calculateInverseKinematics(pos_cmd, quat_cmd, threshold=1e-4, maxIter=5)
+        self.__joints_pos_cmd = jpos_cmd.copy()
 
     def setCartVelocity(self, vel_cmd):
 
@@ -320,6 +372,20 @@ def get5thOrderTraj(t: float, p0: np.array, pf: np.array, total_time: float) -> 
 
     return pos, vel, accel
 
+def get5thOrderCartTraj(t: float, init_pose: np.array, final_pose: np.array, total_time: float):
+
+    init_pos = init_pose[:3]
+    init_quat = init_pose[3:]
+    Q_init = Quaternion(*init_quat)
+
+    final_pos = final_pose[:3]
+    final_quat = final_pose[3:]
+    Q_final = Quaternion(*final_quat)
+
+    init_qLog = Q_final.mul(Q_init.inverse()).log()
+    final_qLog = []
+
+
 
 # ====================================
 # =============  MAIN ================
@@ -374,6 +440,12 @@ def jointSpaceControl(env, robot, Ts, ctrl_mode="position"):
 
     # jvel_data = np.column_stack((np.diff(jpos_data, axis=1)/Ts, np.zeros_like(j_init)))
 
+    # print('=========> final pose:', [ '%.4f' % a for a in robot.getTaskPose()])
+
+    # final_pose = np.array([0.426, -0.31, 0.899, 0.0964, 0.2931, -0.5584, 0.7701])
+    # plotFrame(robot.getTaskPosition(), robot.getTaskQuat(), name='ee', length=0.15, linewidth=2)
+    # plotFrame(final_pose[0:3], final_pose[3:], name='final', length=0.1, linewidth=6)
+
     # ========= Plot ===========
 
     # plt.ion()
@@ -423,13 +495,21 @@ def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
     t = 0.
     n_joints = robot.getNumJoints()
 
-    init_pose = np.array([-0.142, -0.436, 0.152, 0, 0, 0, 1])
-    final_pose = np.array([0.426, -0.31, 0.899, 0.77, 0.0964, 0.2931, -0.5584])
+    init_pose = np.array([-0.142, -0.436, 0.152, 0, 0, 1, 0])
+    final_pose = np.array([0.426, -0.31, 0.75, 0.0964, 0.2931, -0.5584, 0.7701])
 
     T = max(linalg.norm(init_pose[0:3] - final_pose[0:3]) * 4.0, 1.5)
 
-    robot.resetPose(init_pose[0:3], init_pose[3:])
-    robot.update()
+    # plotFrame(final_pose[0:3], final_pose[3:], name='final', length=0.1, linewidth=6)
+
+    # robot.resetPose(final_pose[0:3], final_pose[3:])
+    # robot.update()
+    # print('joints pos:', ['%.3f' % a for a in robot.getJointsPosition()])
+    # print('pos:', ['%.3f' % a for a in robot.getTaskPosition()], ', quat:', ['%.3f' % a for a in robot.getTaskQuat()])
+    # print('target_pos:', final_pose[0:3], ', target_quat:', final_pose[3:])
+    # frame_id = plotFrame(robot.getTaskPosition(), robot.getTaskQuat(), name='ee', length=0.15, linewidth=2)
+    # input('==============================================')
+    # removeFrame(frame_id)
 
     Time = np.array([t])
     pose_data = robot.getTaskPose()
@@ -440,7 +520,7 @@ def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
 
     if ctrl_mode == "position":
         robot.setCtrlMode(CtrlMode.CART_POSITION)
-        setRobotReference = lambda pose_ref, vel_ref: robot.setCartPose(pose_ref)
+        setRobotReference = lambda pose_ref, vel_ref: robot.setCartPose(pose_ref[:3], pose_ref[3:])
     elif ctrl_mode == "velocity":
         robot.setCtrlMode(CtrlMode.CART_VELOCITY)
         setRobotReference = lambda pose_ref, vel_ref: robot.setCartVelocity(vel_ref)
@@ -472,6 +552,22 @@ def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
 
 if __name__ == '__main__':
 
+    quat = Quaternion(*[0.2, 0.1, -0.3, 0.8])
+
+    logQ_dot = np.random.randn(3, 1)
+    vRot = qLogDot_to_rotVel(logQ_dot, quat)
+
+    print('quat:', quat)
+    print('logQ_dot:', logQ_dot)
+    print('vRot:', vRot)
+
+    # print('w:', quat[0])
+    # print('v:', quat[1:])
+
+
+
+    sys.exit()
+
     print("========= Robot trajectory example =========")
 
     with open('../yaml/params.yml', 'r') as stream:
@@ -482,7 +578,7 @@ if __name__ == '__main__':
     env.setTimeStep(Ts)
 
     robot_parmas = params["robot"]
-    robot = Robot(robot_parmas["urdf"], robot_parmas["joints"], robot_parmas["ee_link"],
+    robot = BulletRobot(robot_parmas["urdf"], robot_parmas["joints"], robot_parmas["ee_link"],
                     joint_lower_limits=robot_parmas['joint_limits']['lower'],
                     joint_upper_limits=robot_parmas['joint_limits']['upper'],
                     base_pos=robot_parmas['base']['pos'],
@@ -491,5 +587,5 @@ if __name__ == '__main__':
 
     # jointSpaceControl(env, robot, Ts, ctrl_mode="position")
     
-    CartSpaceControl(env, robot, Ts, ctrl_mode="velocity")
+    CartSpaceControl(env, robot, Ts, ctrl_mode="position")
 

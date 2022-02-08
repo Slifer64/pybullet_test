@@ -14,7 +14,7 @@ import inspect
 import warnings
 import math
 
-from utils.orientation import Quaternion, quatExp, quatLog, qLogDot_to_rotVel
+from utils.orientation.quaternion import Quaternion
 
 # =====================================
 # ============ GUI utils ==============
@@ -180,7 +180,7 @@ class BulletRobot:
             p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.POSITION_CONTROL,
                                         targetPositions=self.__joints_pos_cmd)
         elif self.__ctrl_mode is CtrlMode.CART_VELOCITY:
-            jvel_cmd = np.matmul( linalg.pinv(self.getEEJacobian()), self.__cart_vel_cmd)
+            jvel_cmd = np.matmul(linalg.pinv(self.getEEJacobian()), self.__cart_vel_cmd)
             p.setJointMotorControlArray(self.__robot_id, self.__joint_id, p.VELOCITY_CONTROL, targetVelocities=jvel_cmd)
         else: # CtrlMode.IDLE
             pass
@@ -372,19 +372,23 @@ def get5thOrderTraj(t: float, p0: np.array, pf: np.array, total_time: float) -> 
 
     return pos, vel, accel
 
-def get5thOrderCartTraj(t: float, init_pose: np.array, final_pose: np.array, total_time: float):
 
-    init_pos = init_pose[:3]
-    init_quat = init_pose[3:]
-    Q_init = Quaternion(*init_quat)
+def get5thOrderQuatTraj(t: float, Q0: Quaternion, Qf: Quaternion, total_time: float):
 
-    final_pos = final_pose[:3]
-    final_quat = final_pose[3:]
-    Q_final = Quaternion(*final_quat)
+    assert isinstance(Q0, Quaternion), "'Q0' must be a Quaternion"
+    assert isinstance(Qf, Quaternion), "'Qf' must be a Quaternion"
 
-    init_qLog = Q_final.mul(Q_init.inverse()).log()
-    final_qLog = []
+    qLog_0 = np.array([0, 0, 0])
+    qLog_f = Quaternion.log(Qf.mul(Q0.inv()))
 
+    logQ1, logQ1_dot, logQ1_ddot = get5thOrderTraj(t, qLog_0, qLog_f, total_time)
+
+    Q1 = Quaternion.exp(logQ1)
+    Q = Q1.mul(Q0)
+    rot_vel = Quaternion.logDot_to_rotVel(logQ1_dot, Q1)
+    rot_accel = Quaternion.logDDot_to_rotAccel(logQ1_ddot, rot_vel, Q1)
+
+    return Q, rot_vel, rot_accel
 
 
 # ====================================
@@ -473,9 +477,9 @@ def jointSpaceControl(env, robot, Ts, ctrl_mode="position"):
     axs[n_joints - 1].set_xlabel("time [s]", fontsize=14)
 
     # Cartesian Position trajectories
-    fig, axs = plt.subplots(3,1)
+    fig, axs = plt.subplots(3, 1)
     y_labels = ["x", "y", "z"]
-    for i in range(0,3):
+    for i in range(0, 3):
         axs[i].plot(Time, pos_data[i,:], linewidth=2, color='blue')
         axs[i].set_ylabel(y_labels[i])
     axs[0].set_title("Cartesian position", fontsize=14)
@@ -484,7 +488,7 @@ def jointSpaceControl(env, robot, Ts, ctrl_mode="position"):
     # Cartesian Position path
     fig = plt.figure()
     ax = plt.axes(projection ='3d')
-    ax.plot3D(pos_data[0,:], pos_data[1,:], pos_data[2,:], color='blue')
+    ax.plot3D(pos_data[0,:], pos_data[1, :], pos_data[2, :], color='blue')
     ax.set_title('Cartesian Position path')
 
     plt.show()
@@ -493,30 +497,37 @@ def jointSpaceControl(env, robot, Ts, ctrl_mode="position"):
 def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
     
     t = 0.
-    n_joints = robot.getNumJoints()
 
     init_pose = np.array([-0.142, -0.436, 0.152, 0, 0, 1, 0])
     final_pose = np.array([0.426, -0.31, 0.75, 0.0964, 0.2931, -0.5584, 0.7701])
 
     T = max(linalg.norm(init_pose[0:3] - final_pose[0:3]) * 4.0, 1.5)
 
-    # plotFrame(final_pose[0:3], final_pose[3:], name='final', length=0.1, linewidth=6)
+    # robot.resetPose(init_pose[:3], init_pose[3:]) # produces the same pose with different joint config...
+    robot.resetJoints(np.array([-1.6, -1.73, -2.2, -0.808, 1.6, -0.031]))
 
-    # robot.resetPose(final_pose[0:3], final_pose[3:])
-    # robot.update()
-    # print('joints pos:', ['%.3f' % a for a in robot.getJointsPosition()])
-    # print('pos:', ['%.3f' % a for a in robot.getTaskPosition()], ', quat:', ['%.3f' % a for a in robot.getTaskQuat()])
-    # print('target_pos:', final_pose[0:3], ', target_quat:', final_pose[3:])
-    # frame_id = plotFrame(robot.getTaskPosition(), robot.getTaskQuat(), name='ee', length=0.15, linewidth=2)
-    # input('==============================================')
-    # removeFrame(frame_id)
+    # fmt = lambda x: ' , '.join(['%.3f' % a for a in x])
+    # print('pose:', fmt(robot.getTaskPose()))
+    # print('init_pose:', fmt(init_pose))
+    # print('joint:', fmt(robot.getJointsPosition()))
+    # print('-------------------------')
+
+    # Jee = robot.getEEJacobian()
+    # for row in Jee:
+    #     print(' , '.join(['%6.3f' % a for a in row]))
+    #
+    # sys.exit()
+
+    plotFrame(init_pose[0:3], init_pose[3:], name='init', length=0.1, linewidth=6)
+    plotFrame(final_pose[0:3], final_pose[3:], name='final', length=0.1, linewidth=6)
 
     Time = np.array([t])
     pose_data = robot.getTaskPose()
-    vel_data = np.zeros_like(init_pose)
+    vel_data = np.zeros(6)
+    # accel_data = np.zeros((6, 1))
 
     pose_ref_data = init_pose
-    vel_ref_data = np.zeros_like(init_pose)
+    vel_ref_data = np.zeros(6)
 
     if ctrl_mode == "position":
         robot.setCtrlMode(CtrlMode.CART_POSITION)
@@ -532,41 +543,55 @@ def CartSpaceControl(env, robot, Ts, ctrl_mode="position"):
         env.step()
         robot.update()
 
-        pose_ref, vel_rel, _ = get5thOrderTraj(t, init_pose, final_pose, T)
-        setRobotReference(pose_ref, vel_rel)
+        pos_ref, pdot_ref, _ = get5thOrderTraj(t, init_pose[:3], final_pose[:3], T)
+        quat_ref, rotVel_ref, _ = get5thOrderQuatTraj(t, Quaternion(*init_pose[3:]), Quaternion(*final_pose[3:]), T)
 
-        # Quaternion has to be normalized, or more correctly, use quatLog and quatExp
+        pose_ref = np.concatenate((pos_ref, quat_ref()))
+        vel_ref = np.concatenate((pdot_ref, rotVel_ref))
+
+        use_click = False
+        if use_click:
+            pos_click = 2.0 * (pose_ref[:3] - robot.getTaskPosition())
+            Q_ref = Quaternion(*pose_ref[3:])
+            Q_robot = Quaternion(*robot.getTaskQuat())
+            orient_click = 2.0 * Quaternion.log(Q_ref.diff(Q_robot))
+            vel_ref += np.concatenate((pos_click, orient_click))
+
+        setRobotReference(pose_ref, vel_ref)
 
         t += Ts
         Time = np.append(Time, t)
         pose_data = np.column_stack((pose_data, robot.getTaskPose()))
         pose_ref_data = np.column_stack((pose_ref_data, pose_ref))
-        vel_ref_data = np.column_stack((vel_ref_data, vel_rel))
+        vel_ref_data = np.column_stack((vel_ref_data, vel_ref))
 
     # ========= Plot ===========
 
-    # TODO
+    # Cartesian Position trajectories
+    fig, axs = plt.subplots(3, 1)
+    y_labels = ["x", "y", "z"]
+    for i in range(0, 3):
+        axs[i].plot(Time, pose_data[i, :], linewidth=2, color='blue', label='robot')
+        axs[i].plot(Time, pose_ref_data[i, :], linewidth=2, linestyle='--', color='magenta', label='ref')
+        axs[i].set_ylabel(y_labels[i])
+    axs[0].legend(loc='upper left', fontsize=14)
+    axs[0].set_title("Cartesian position", fontsize=14)
+    axs[2].set_xlabel("time [s]", fontsize=14)
 
-    input('Press [enter] to continue...')
+    # Cartesian Position path
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(pose_data[0, :], pose_data[1, :], pose_data[2, :], color='blue', label='robot')
+    ax.plot3D(pose_ref_data[0, :], pose_ref_data[1, :], pose_ref_data[2, :], linestyle='--', color='magenta', label='ref')
+    ax.legend(loc='upper left', fontsize=14)
+    ax.set_title('Cartesian Position path')
+
+    plt.show()
+
+    # input('Press [enter] to continue...')
 
 
 if __name__ == '__main__':
-
-    quat = Quaternion(*[0.2, 0.1, -0.3, 0.8])
-
-    logQ_dot = np.random.randn(3, 1)
-    vRot = qLogDot_to_rotVel(logQ_dot, quat)
-
-    print('quat:', quat)
-    print('logQ_dot:', logQ_dot)
-    print('vRot:', vRot)
-
-    # print('w:', quat[0])
-    # print('v:', quat[1:])
-
-
-
-    sys.exit()
 
     print("========= Robot trajectory example =========")
 
@@ -587,5 +612,5 @@ if __name__ == '__main__':
 
     # jointSpaceControl(env, robot, Ts, ctrl_mode="position")
     
-    CartSpaceControl(env, robot, Ts, ctrl_mode="position")
+    CartSpaceControl(env, robot, Ts, ctrl_mode="velocity")
 

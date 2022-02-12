@@ -3,7 +3,7 @@
 import numpy as np
 import numpy.linalg as linalg
 
-from quaternion import Quaternion
+from .quaternion import Quaternion
 
 
 class Affine3:

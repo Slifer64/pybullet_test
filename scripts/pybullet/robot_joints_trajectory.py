@@ -2,19 +2,21 @@ import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-import numpy.matlib as matlib
+# from mpl_toolkits import mplot3d
+# import numpy.matlib as matlib
 import numpy.linalg as linalg
 import yaml
 import pybullet as p
 import pybullet_data
 import time
 import enum
-import inspect
+# import inspect
 import warnings
 import math
 
 from utils.orientation.quaternion import Quaternion
+from utils.orientation.affine3 import Affine3
+
 
 # =====================================
 # ============ GUI utils ==============
@@ -53,6 +55,7 @@ class Gui:
     def speed(self):
         self.wait = p.readUserDebugParameter(self.id_2)
 
+
 def plotFrame(pos, quat, name=None, length=0.1, linewidth=3):
 
     quat = Quaternion(*quat)
@@ -63,6 +66,7 @@ def plotFrame(pos, quat, name=None, length=0.1, linewidth=3):
         p.addUserDebugText(text=name, textPosition=pos)
 
     return [x_id, y_id, z_id]
+
 
 def removeFrame(frame_id):
 
